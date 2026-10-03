@@ -1,0 +1,15 @@
+[Unit]
+Description=VPS Money Machine - bot Telegram berlangganan
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/crypto-signal
+EnvironmentFile=/opt/crypto-signal/.env
+ExecStart=/opt/crypto-signal/.venv/bin/python /opt/crypto-signal/bot.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=VPS Money Machine - ambil harga & kirim sinyal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/crypto-signal
+EnvironmentFile=/opt/crypto-signal/.env
+ExecStart=/opt/crypto-signal/.venv/bin/python /opt/crypto-signal/main.py
