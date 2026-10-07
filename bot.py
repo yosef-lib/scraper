@@ -79,7 +79,7 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             body = "\n".join(lines[:1])
             tail = (
                 "\n\n_...Sinyal ini terlambat 15 menit._\n"
-                "🚨 *3 Koin lain sedang mengalami lonjakan volume tinggi (Whale Alert)!*\n"
+                "🚨 *3 Koin lain sedang mengalami lonjakan volume tinggi (Smart Money Alert)!*\n"
                 "👉 Upgrade Premium untuk akses Real-Time & Volume Scanner."
             )
             notifier.send_message(chat_id, body + tail, parse_mode="Markdown", reply_markup=keyboard)
@@ -90,7 +90,7 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             f"Harga Promo: *Rp 50.000* / 30 hari\n"
             f"Fitur VIP:\n"
             f"✅ Auto-Chart: Otomatis kirim grafik gambar saat ada lonjakan!\n"
-            f"✅ Alert Whale & Volume Spike Real-time\n"
+            f"✅ Alert Smart Money & Volume Spike Real-time\n"
             f"✅ Unlock semua koin crypto\n\n"
             f"🛒 *Beli Otomatis 24 Jam:*\n"
             f"Klik link 👉 https://lynk.id/whaleradar\n\n"

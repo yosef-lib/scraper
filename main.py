@@ -66,7 +66,7 @@ def build_summary(signals: list[analyzer.Signal]) -> str:
     alerts = analyzer.only_alerts(signals)
     whales = [s for s in alerts if s.is_whale]
     
-    footer = f"\n\n⚠️ {len(alerts)} sinyal alert ({len(whales)} Whale Detected)."
+    footer = f"\n\n⚠️ {len(alerts)} sinyal alert ({len(whales)} Lonjakan Volume)."
     return f"{header}\n{body}{footer}"
 
 def export_csv(signals: list[analyzer.Signal]) -> str:

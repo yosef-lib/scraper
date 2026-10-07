@@ -36,9 +36,9 @@ def send_promo_to_channel(coin_data) -> bool:
     emoji = "🚀" if coin_data.change_24h > 0 else "📉"
     
     templates = [
-        f"🔥 *MARKET UPDATE*\n\n{coin_data.coin.upper()} sedang bergejolak {emoji}\nPerubahan: *{coin_data.change_24h:+.2f}%*\nVolume 24j: *${vol_m:,.1f}M*\n\n💎 *Member VIP* sudah mendapatkan notifikasi & grafik otomatis dari pergerakan ini lebih awal!\n\nJangan sampai ketinggalan kereta paus (whale) berikutnya.\n👉 *Upgrade VIP 24 Jam Non-stop:* https://lynk.id/whaleradar",
+        f"🔥 *MARKET UPDATE*\n\n{coin_data.coin.upper()} sedang bergejolak {emoji}\nPerubahan: *{coin_data.change_24h:+.2f}%*\nVolume 24j: *${vol_m:,.1f}M*\n\n💎 *Member VIP* sudah mendapatkan notifikasi & grafik otomatis dari pergerakan ini lebih awal!\n\nJangan sampai ketinggalan momentum besar berikutnya.\n👉 *Upgrade VIP 24 Jam Non-stop:* https://lynk.id/whaleradar",
         
-        f"🐋 *PAUS TERDETEKSI BERGERAK*\n\nPerhatian pada koin {coin_data.coin.upper()}! Volume transaksi harian mencapai *${vol_m:,.1f}M*.\n\nDi channel gratis ini sinyal selalu *delay*. Ingin tahu koin apa lagi yang sedang diakumulasi bandar secara Real-Time?\n\n🤖 *Gunakan AI Whale Radar VIP sekarang!*\n👉 Klik: https://lynk.id/whaleradar"
+        f"🚨 *SMART MONEY TERDETEKSI BERGERAK*\n\nPerhatian pada koin {coin_data.coin.upper()}! Volume transaksi harian mencapai *${vol_m:,.1f}M*.\n\nDi channel gratis ini sinyal selalu *delay*. Ingin tahu koin apa lagi yang sedang diakumulasi bandar secara Real-Time?\n\n🤖 *Gunakan AI Smart Radar VIP sekarang!*\n👉 Klik: https://lynk.id/whaleradar"
     ]
     
     msg = random.choice(templates)

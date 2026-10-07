@@ -29,7 +29,7 @@ class Signal:
         )
         if self.is_whale:
             vol_m = self.volume_24h / 1_000_000
-            return f"🚨 *WHALE DETECTED!*\n{base} | Vol: ${vol_m:,.1f}M"
+            return f"🚨 *SMART MONEY DETECTED!*\n{base} | Vol: ${vol_m:,.1f}M"
         return base
 
 def analyze(prices: list[CoinPrice]) -> list[Signal]:
