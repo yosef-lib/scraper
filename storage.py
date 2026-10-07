@@ -3,8 +3,10 @@
 Menyimpan:
 - riwayat harga (price_history) untuk menghitung sinyal
 - daftar subscriber (subscribers) untuk gating free vs premium
+- voucher aktivasi (vouchers) untuk sistem langganan unik sekali pakai
 """
 import sqlite3
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 
@@ -37,6 +39,7 @@ def init_db() -> None:
                 coin TEXT NOT NULL,
                 price REAL NOT NULL,
                 change_24h REAL NOT NULL,
+                volume_24h REAL DEFAULT 0,
                 recorded_at TEXT NOT NULL
             );
 
@@ -48,29 +51,35 @@ def init_db() -> None:
                 joined_at TEXT NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS vouchers (
+                code TEXT PRIMARY KEY,
+                days INTEGER NOT NULL,
+                is_used INTEGER DEFAULT 0,
+                used_by TEXT,
+                created_at TEXT NOT NULL
+            );
+
             CREATE INDEX IF NOT EXISTS idx_price_coin_time
                 ON price_history (coin, recorded_at);
             """
         )
 
-
-def save_price(coin: str, price: float, change_24h: float) -> None:
+# --- Price History ---
+def save_price(coin: str, price: float, change_24h: float, volume_24h: float = 0) -> None:
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO price_history (coin, price, change_24h, recorded_at) "
-            "VALUES (?, ?, ?, ?)",
-            (coin, price, change_24h, datetime.now(timezone.utc).isoformat()),
+            "INSERT INTO price_history (coin, price, change_24h, volume_24h, recorded_at) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (coin, price, change_24h, volume_24h, datetime.now(timezone.utc).isoformat()),
         )
 
-
-def last_price(coin: str) -> sqlite3.Row | None:
+def get_price_history(coin: str, limit: int = 24) -> list[sqlite3.Row]:
     with get_conn() as conn:
         cur = conn.execute(
-            "SELECT * FROM price_history WHERE coin = ? ORDER BY id DESC LIMIT 1",
-            (coin,),
+            "SELECT * FROM price_history WHERE coin = ? ORDER BY id DESC LIMIT ?",
+            (coin, limit),
         )
-        return cur.fetchone()
-
+        return cur.fetchall()
 
 def cleanup_history(days: int = 30) -> int:
     cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
@@ -91,14 +100,12 @@ def upsert_subscriber(chat_id: str, username: str | None = None) -> None:
             (str(chat_id), username, datetime.now(timezone.utc).isoformat()),
         )
 
-
 def get_subscriber(chat_id: str) -> sqlite3.Row | None:
     with get_conn() as conn:
         cur = conn.execute(
             "SELECT * FROM subscribers WHERE chat_id = ?", (str(chat_id),)
         )
         return cur.fetchone()
-
 
 def is_premium(chat_id: str) -> bool:
     row = get_subscriber(chat_id)
@@ -110,11 +117,26 @@ def is_premium(chat_id: str) -> bool:
         return False
     if until.tzinfo is None:
         until = until.replace(tzinfo=timezone.utc)
+    
+    # Auto-demote jika sudah expired (optional logic, tapi cukup return False di sini)
     return until > datetime.now(timezone.utc)
 
 
 def activate_premium(chat_id: str, days: int) -> str:
-    until = datetime.now(timezone.utc) + timedelta(days=days)
+    # Jika sudah premium, tambah harinya
+    row = get_subscriber(chat_id)
+    now = datetime.now(timezone.utc)
+    if row and row["premium_until"]:
+        try:
+            current_until = datetime.fromisoformat(row["premium_until"])
+            if current_until.tzinfo is None:
+                current_until = current_until.replace(tzinfo=timezone.utc)
+            if current_until > now:
+                now = current_until
+        except ValueError:
+            pass
+            
+    until = now + timedelta(days=days)
     with get_conn() as conn:
         conn.execute(
             "UPDATE subscribers SET plan = 'premium', premium_until = ? "
@@ -123,7 +145,6 @@ def activate_premium(chat_id: str, days: int) -> str:
         )
     return until.isoformat()
 
-
 def all_subscribers(premium_only: bool = False) -> list[sqlite3.Row]:
     with get_conn() as conn:
         cur = conn.execute("SELECT * FROM subscribers")
@@ -131,3 +152,34 @@ def all_subscribers(premium_only: bool = False) -> list[sqlite3.Row]:
     if premium_only:
         return [r for r in rows if is_premium(r["chat_id"])]
     return rows
+
+# --- Vouchers ---
+def create_voucher(days: int = 30) -> str:
+    # PREM- (8 karakter acak)
+    code = f"PREM-{uuid.uuid4().hex[:8].upper()}"
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT INTO vouchers (code, days, created_at) VALUES (?, ?, ?)",
+            (code, days, datetime.now(timezone.utc).isoformat())
+        )
+    return code
+
+def claim_voucher(code: str, chat_id: str) -> tuple[bool, str]:
+    with get_conn() as conn:
+        cur = conn.execute("SELECT * FROM vouchers WHERE code = ?", (code,))
+        row = cur.fetchone()
+        
+        if not row:
+            return False, "Kode voucher tidak ditemukan."
+        if row["is_used"]:
+            return False, "Kode voucher sudah pernah digunakan."
+            
+        # Tandai terpakai
+        conn.execute(
+            "UPDATE vouchers SET is_used = 1, used_by = ? WHERE code = ?",
+            (str(chat_id), code)
+        )
+        
+    # Aktivasi akunnya
+    until = activate_premium(chat_id, row["days"])
+    return True, until

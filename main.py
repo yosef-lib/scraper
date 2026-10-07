@@ -3,8 +3,8 @@
 Alur:
 1. ambil harga dari sumber
 2. simpan ke riwayat
-3. hitung sinyal
-4. kirim ringkasan ke admin, dan alert ke subscriber premium
+3. hitung sinyal (Whale & Price)
+4. kirim ringkasan ke admin, dan alert VIP ke subscriber premium
 """
 import csv
 import logging
@@ -31,14 +31,12 @@ def _setup_logging() -> None:
 
 
 def build_summary(signals: list[analyzer.Signal]) -> str:
-    header = f"🪙 Ringkasan Harga ({datetime.now():%Y-%m-%d %H:%M})\n"
+    header = f"dYT Ringkasan Harga ({datetime.now():%Y-%m-%d %H:%M})\n"
     body = "\n".join(s.format_line() for s in signals)
     alerts = analyzer.only_alerts(signals)
-    footer = (
-        f"\n\n⚠️ {len(alerts)} sinyal melewati ambang {config.ALERT_PERCENT}%."
-        if alerts
-        else "\n\nTidak ada sinyal ekstrem saat ini."
-    )
+    whales = [s for s in alerts if s.is_whale]
+    
+    footer = f"\n\ns,? {len(alerts)} sinyal alert ({len(whales)} Whale Detected)."
     return f"{header}\n{body}{footer}"
 
 
@@ -46,11 +44,11 @@ def export_csv(signals: list[analyzer.Signal]) -> str:
     filename = config.BASE_DIR / "hasil_harga.csv"
     with open(filename, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["coin", "price", "change_24h", "currency", "waktu"])
+        writer.writerow(["coin", "price", "change_24h", "volume_24h", "currency", "waktu"])
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         for s in signals:
             writer.writerow(
-                [s.coin, s.price, f"{s.change_24h:.2f}", config.VS_CURRENCY, now]
+                [s.coin, s.price, f"{s.change_24h:.2f}", f"{s.volume_24h:.2f}", config.VS_CURRENCY, now]
             )
     return str(filename)
 
@@ -64,8 +62,9 @@ def run_once() -> int:
         log.warning("Tidak ada harga yang berhasil diambil.")
         return 1
 
+    # Simpan history harga DAN volume untuk analisis anomali
     for p in prices:
-        storage.save_price(p.coin, p.price, p.change_24h)
+        storage.save_price(p.coin, p.price, p.change_24h, p.volume_24h)
 
     signals = analyzer.analyze(prices)
     summary = build_summary(signals)
@@ -81,14 +80,14 @@ def run_once() -> int:
     else:
         log.info("TELEGRAM_ADMIN_CHAT_ID kosong, laporan hanya di log.")
 
-    # Alert detail hanya ke premium
+    # Alert detail VIP hanya ke premium
     alerts = analyzer.only_alerts(signals)
     if alerts:
-        alert_text = "🚨 ALERT SINYAL\n\n" + "\n".join(
+        alert_text = "dYs" *VIP SIGNAL ALERT*\n\n" + "\n\n".join(
             s.format_line() for s in alerts
         )
         for sub in storage.all_subscribers(premium_only=True):
-            notifier.send_message(sub["chat_id"], alert_text)
+            notifier.send_message(sub["chat_id"], alert_text, parse_mode="Markdown")
 
     storage.cleanup_history(days=30)
     return 0
