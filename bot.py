@@ -1,14 +1,7 @@
-"""Bot Telegram berlangganan.
+"""Bot Telegram berlangganan dengan Reply Keyboard.
 
-Perintah:
-  /start      - daftar & info paket
-  /harga      - harga terbaru (semua pengguna, versi ringkas)
-  /premium    - cara berlangganan
-  /aktivasi <kode> - aktivasi premium dengan voucher unik
-  /status     - cek status langganan
-  
-Admin:
-  /generate_voucher - buat kode unik (hanya admin)
+Perintah Utama:
+  /start - Menampilkan menu tombol
 """
 import logging
 import time
@@ -21,11 +14,20 @@ import storage
 
 log = logging.getLogger("bot")
 
+def get_main_keyboard():
+    """Mengembalikan custom keyboard (tombol besar di bawah)."""
+    return {
+        "keyboard": [
+            [{"text": "💰 Cek Harga"}, {"text": "💎 Beli Premium"}],
+            [{"text": "👤 Status Akun"}],
+        ],
+        "resize_keyboard": True,
+        "is_persistent": True
+    }
+
 HELP_TEXT = (
     "🤖 *Bot Sinyal Harga VIP*\n\n"
-    "/harga - Lihat harga terbaru\n"
-    "/premium - Info & harga langganan\n"
-    "/status - Cek status langgananmu\n"
+    "Gunakan tombol di bawah untuk navigasi, atau ketik manual:\n"
     "/aktivasi <kode> - Aktifkan premium\n"
 )
 
@@ -42,88 +44,93 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     parts = text.strip().split()
     cmd = parts[0].lower() if parts else ""
 
+    # Map text dari tombol ke command logic
+    if text == "💰 Cek Harga":
+        cmd = "/harga"
+    elif text == "💎 Beli Premium":
+        cmd = "/premium"
+    elif text == "👤 Status Akun":
+        cmd = "/status"
+
+    keyboard = get_main_keyboard()
+
     if cmd == "/start":
-        notifier.send_message(chat_id, HELP_TEXT, parse_mode="Markdown")
+        notifier.send_message(chat_id, HELP_TEXT, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/harga":
         prices = sources.fetch_prices()
         if not prices:
-            notifier.send_message(chat_id, "Maaf, gagal mengambil harga.")
+            notifier.send_message(chat_id, "Maaf, gagal mengambil harga.", reply_markup=keyboard)
             return
         
         premium = storage.is_premium(chat_id)
         lines = []
         for p in prices:
             if premium:
-                # Premium melihat volume dan persen lengkap
                 vol_m = p.volume_24h / 1_000_000 if p.volume_24h else 0
                 lines.append(f"💎 {p.coin.upper()}: {p.price:,.2f} ({p.change_24h:+.2f}%) | Vol: ${vol_m:,.1f}M")
             else:
-                # free: hanya 1 koin tanpa detail
                 lines.append(f"🟢 {p.coin.upper()}: {p.price:,.2f}")
         
         if premium:
             body = "\n".join(lines)
-            notifier.send_message(chat_id, "🤖 *Laporan Premium*\n" + body, parse_mode="Markdown")
+            notifier.send_message(chat_id, "🤖 *Laporan Premium*\n" + body, parse_mode="Markdown", reply_markup=keyboard)
         else:
             body = "\n".join(lines[:1])
             tail = (
                 "\n\n_...Sinyal ini terlambat 15 menit._\n"
                 "🚨 *3 Koin lain sedang mengalami lonjakan volume tinggi (Whale Alert)!*\n"
-                "💎 Upgrade ke Premium (Rp 25.000/bln) untuk akses Real-Time & Volume Scanner. Ketik /premium"
+                "👉 Upgrade Premium untuk akses Real-Time & Volume Scanner."
             )
-            notifier.send_message(chat_id, body + tail, parse_mode="Markdown")
+            notifier.send_message(chat_id, body + tail, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/premium":
         msg = (
             f"💎 *Akses Premium*\n\n"
-            f"Harga Promo: *Rp 25.000* / 30 hari\n"
+            f"Harga Promo: *Rp 50.000* / 30 hari\n"
             f"Fitur VIP:\n"
+            f"✅ Auto-Chart: Otomatis kirim grafik gambar saat ada lonjakan!\n"
             f"✅ Alert Whale & Volume Spike Real-time\n"
-            f"✅ Unlock semua koin crypto\n"
-            f"✅ Analisis persentase detail\n\n"
-            f"Cara Bayar: Transfer ke BCA / GoPay (Hubungi Admin @UsernameAdmin).\n"
-            f"Setelah dapat kode, kirim: `/aktivasi PREM-XXXX`"
+            f"✅ Unlock semua koin crypto\n\n"
+            f"Cara Bayar: Transfer ke BCA (Hubungi Admin).\n"
+            f"Setelah dapat kode voucher, ketik di chat ini:\n`/aktivasi PREM-XXXX`"
         )
-        notifier.send_message(chat_id, msg, parse_mode="Markdown")
+        notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/aktivasi":
         if len(parts) < 2:
-            notifier.send_message(chat_id, "Format: /aktivasi <kode_voucher>")
+            notifier.send_message(chat_id, "Format: `/aktivasi <kode_voucher>`", parse_mode="Markdown", reply_markup=keyboard)
             return
         code = parts[1].strip().upper()
-        
-        # Dukungan legacy untuk ADMIN_SECRET lama, jika terpaksa
-        if config.ADMIN_SECRET and code == config.ADMIN_SECRET.upper():
-            until = storage.activate_premium(chat_id, config.PREMIUM_DURATION_DAYS)
-            notifier.send_message(chat_id, f"✅ [LEGACY] Premium aktif sampai {until[:10]}. Segera gunakan sistem voucher baru.")
-            return
 
         success, msg = storage.claim_voucher(code, chat_id)
         if success:
-            notifier.send_message(chat_id, f"💎 *SELAMAT!* Akunmu sudah Premium.\nBerlaku sampai: {msg[:10]}", parse_mode="Markdown")
-            # Beritahu admin ada yang aktivasi
+            notifier.send_message(chat_id, f"💎 *SELAMAT!* Akunmu sudah Premium.\nBerlaku sampai: {msg[:10]}", parse_mode="Markdown", reply_markup=keyboard)
             if config.TELEGRAM_ADMIN_CHAT_ID:
                 notifier.send_message(config.TELEGRAM_ADMIN_CHAT_ID, f"💎 Aktivasi Voucher: @{username} (ID:{chat_id}) memakai {code}")
         else:
-            notifier.send_message(chat_id, f"❌ Gagal: {msg}")
+            notifier.send_message(chat_id, f"❌ Gagal: {msg}", reply_markup=keyboard)
 
     elif cmd == "/status":
         if storage.is_premium(chat_id):
             row = storage.get_subscriber(chat_id)
-            notifier.send_message(chat_id, f"✅ *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown")
+            notifier.send_message(chat_id, f"✅ *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown", reply_markup=keyboard)
         else:
-            notifier.send_message(chat_id, "Kamu pengguna FREE. Ketik /premium untuk upgrade.")
+            notifier.send_message(chat_id, "Kamu pengguna FREE. Klik tombol [Beli Premium] untuk upgrade.", reply_markup=keyboard)
 
     elif cmd == "/generate_voucher":
         if str(chat_id) != str(config.TELEGRAM_ADMIN_CHAT_ID):
             notifier.send_message(chat_id, "Akses ditolak.")
             return
         code = storage.create_voucher(30)
-        notifier.send_message(chat_id, f"Voucher 30 hari berhasil dibuat:\n\n`{code}`", parse_mode="Markdown")
+        notifier.send_message(chat_id, f"Voucher 30 hari berhasil dibuat:\n\n`{code}`\n\nKirim kode ini ke pembeli.", parse_mode="Markdown")
 
     else:
-        notifier.send_message(chat_id, "Perintah tidak dikenal.\n\n" + HELP_TEXT, parse_mode="Markdown")
+        # Jika bukan command, anggap ngobrol biasa
+        if not text.startswith("/"):
+            notifier.send_message(chat_id, "Gunakan tombol di bawah untuk menu cepat 👇", reply_markup=keyboard)
+        else:
+            notifier.send_message(chat_id, "Perintah tidak dikenal.\n\n" + HELP_TEXT, parse_mode="Markdown", reply_markup=keyboard)
 
 def run_polling() -> None:
     config.require_telegram()

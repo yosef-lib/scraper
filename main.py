@@ -4,11 +4,13 @@ Alur:
 1. ambil harga dari sumber
 2. simpan ke riwayat
 3. hitung sinyal (Whale & Price)
-4. kirim ringkasan ke admin, dan alert VIP ke subscriber premium
+4. kirim ringkasan ke admin, dan alert VIP (beserta Auto-Chart) ke subscriber premium
 """
 import csv
 import logging
 import sys
+import json
+import urllib.parse
 from datetime import datetime
 
 import analyzer
@@ -29,6 +31,34 @@ def _setup_logging() -> None:
         ],
     )
 
+def generate_chart_url(coin: str, prices: list[float]) -> str:
+    """Menggunakan QuickChart.io untuk Auto-Chart."""
+    # Ambil 50 data poin terakhir biar grafik ga terlalu padat
+    if len(prices) > 50:
+        prices = prices[-50:]
+        
+    chart_config = {
+        "type": "line",
+        "data": {
+            "labels": [""] * len(prices),
+            "datasets": [{
+                "label": coin.upper(),
+                "data": prices,
+                "borderColor": "rgba(46, 204, 113, 1)" if prices[-1] >= prices[0] else "rgba(231, 76, 60, 1)",
+                "backgroundColor": "rgba(46, 204, 113, 0.2)" if prices[-1] >= prices[0] else "rgba(231, 76, 60, 0.2)",
+                "fill": True,
+                "borderWidth": 3,
+                "pointRadius": 0
+            }]
+        },
+        "options": {
+            "plugins": {"legend": {"display": False}},
+            "scales": {"x": {"display": False}, "y": {"display": True}},
+            "layout": {"padding": 10}
+        }
+    }
+    encoded_json = urllib.parse.quote(json.dumps(chart_config))
+    return f"https://quickchart.io/chart?w=500&h=300&c={encoded_json}"
 
 def build_summary(signals: list[analyzer.Signal]) -> str:
     header = f"🤖 Ringkasan Harga ({datetime.now():%Y-%m-%d %H:%M})\n"
@@ -38,7 +68,6 @@ def build_summary(signals: list[analyzer.Signal]) -> str:
     
     footer = f"\n\n⚠️ {len(alerts)} sinyal alert ({len(whales)} Whale Detected)."
     return f"{header}\n{body}{footer}"
-
 
 def export_csv(signals: list[analyzer.Signal]) -> str:
     filename = config.BASE_DIR / "hasil_harga.csv"
@@ -51,7 +80,6 @@ def export_csv(signals: list[analyzer.Signal]) -> str:
                 [s.coin, s.price, f"{s.change_24h:.2f}", f"{s.volume_24h:.2f}", config.VS_CURRENCY, now]
             )
     return str(filename)
-
 
 def run_once() -> int:
     log = logging.getLogger("main")
@@ -83,15 +111,22 @@ def run_once() -> int:
     # Alert detail VIP hanya ke premium
     alerts = analyzer.only_alerts(signals)
     if alerts:
-        alert_text = "🚨" *VIP SIGNAL ALERT*\n\n" + "\n\n".join(
-            s.format_line() for s in alerts
-        )
-        for sub in storage.all_subscribers(premium_only=True):
-            notifier.send_message(sub["chat_id"], alert_text, parse_mode="Markdown")
+        subs = storage.all_subscribers(premium_only=True)
+        for s in alerts:
+            alert_text = f"🚨 *VIP SIGNAL ALERT*\n\n{s.format_line()}"
+            # Fetch chart
+            chart_data = sources.fetch_market_chart(s.coin, days=1)
+            if chart_data:
+                chart_url = generate_chart_url(s.coin, chart_data)
+                for sub in subs:
+                    # Send photo with caption
+                    notifier.send_photo(sub["chat_id"], chart_url, caption=alert_text, parse_mode="Markdown")
+            else:
+                for sub in subs:
+                    notifier.send_message(sub["chat_id"], alert_text, parse_mode="Markdown")
 
     storage.cleanup_history(days=30)
     return 0
-
 
 if __name__ == "__main__":
     _setup_logging()

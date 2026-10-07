@@ -1,6 +1,6 @@
 """Sumber data harga.
 
-Fetch dari CoinGecko, sekarang termasuk volume 24 jam untuk deteksi whale/anomali.
+Fetch dari CoinGecko, termasuk volume 24 jam untuk deteksi whale/anomali.
 """
 from dataclasses import dataclass
 from typing import Iterable
@@ -55,3 +55,17 @@ def fetch_prices(coins: Iterable[str] | None = None) -> list[CoinPrice]:
             )
         )
     return result
+
+def fetch_market_chart(coin: str, days: int = 1) -> list[float]:
+    """Mengambil riwayat harga dari CoinGecko untuk membuat grafik."""
+    url = f"{config.COINGECKO_API}/coins/{coin}/market_chart"
+    params = {"vs_currency": config.VS_CURRENCY, "days": days}
+    try:
+        resp = requests.get(url, params=params, timeout=20, headers={"User-Agent": "vps-money-machine/2.0"})
+        resp.raise_for_status()
+        prices_data = resp.json().get("prices", [])
+        # prices_data is [[timestamp, price], ...]
+        # Return only the prices
+        return [p[1] for p in prices_data]
+    except Exception:
+        return []
