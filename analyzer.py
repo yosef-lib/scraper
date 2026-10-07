@@ -21,7 +21,7 @@ class Signal:
     is_whale: bool
 
     def format_line(self) -> str:
-        arrow = "dY"^" if self.direction == "naik" else "dY"%"
+        arrow = "👉^" if self.direction == "naik" else "👉%"
         base = (
             f"{arrow} {self.coin.upper()}: "
             f"{self.price:,.2f} {config.VS_CURRENCY.upper()} "
@@ -29,7 +29,7 @@ class Signal:
         )
         if self.is_whale:
             vol_m = self.volume_24h / 1_000_000
-            return f"dYs" *WHALE DETECTED!*\n{base} | Vol: ${vol_m:,.1f}M"
+            return f"🚨" *WHALE DETECTED!*\n{base} | Vol: ${vol_m:,.1f}M"
         return base
 
 def analyze(prices: list[CoinPrice]) -> list[Signal]:

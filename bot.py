@@ -22,7 +22,7 @@ import storage
 log = logging.getLogger("bot")
 
 HELP_TEXT = (
-    "dYT *Bot Sinyal Harga VIP*\n\n"
+    "🤖 *Bot Sinyal Harga VIP*\n\n"
     "/harga - Lihat harga terbaru\n"
     "/premium - Info & harga langganan\n"
     "/status - Cek status langgananmu\n"
@@ -57,14 +57,14 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             if premium:
                 # Premium melihat volume dan persen lengkap
                 vol_m = p.volume_24h / 1_000_000 if p.volume_24h else 0
-                lines.append(f"dY'Z {p.coin.upper()}: {p.price:,.2f} ({p.change_24h:+.2f}%) | Vol: ${vol_m:,.1f}M")
+                lines.append(f"💎 {p.coin.upper()}: {p.price:,.2f} ({p.change_24h:+.2f}%) | Vol: ${vol_m:,.1f}M")
             else:
                 # free: hanya 1 koin tanpa detail
-                lines.append(f"dY'Y {p.coin.upper()}: {p.price:,.2f}")
+                lines.append(f"🟢 {p.coin.upper()}: {p.price:,.2f}")
         
         if premium:
             body = "\n".join(lines)
-            notifier.send_message(chat_id, "dYT *Laporan Premium*\n" + body, parse_mode="Markdown")
+            notifier.send_message(chat_id, "🤖 *Laporan Premium*\n" + body, parse_mode="Markdown")
         else:
             body = "\n".join(lines[:1])
             tail = (
@@ -76,12 +76,12 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
 
     elif cmd == "/premium":
         msg = (
-            f"dY'Z *Akses Premium*\n\n"
+            f"💎 *Akses Premium*\n\n"
             f"Harga Promo: *Rp 25.000* / 30 hari\n"
             f"Fitur VIP:\n"
-            f"a|s Alert Whale & Volume Spike Real-time\n"
-            f"a|s Unlock semua koin crypto\n"
-            f"a|s Analisis persentase detail\n\n"
+            f"✅ Alert Whale & Volume Spike Real-time\n"
+            f"✅ Unlock semua koin crypto\n"
+            f"✅ Analisis persentase detail\n\n"
             f"Cara Bayar: Transfer ke BCA / GoPay (Hubungi Admin @UsernameAdmin).\n"
             f"Setelah dapat kode, kirim: `/aktivasi PREM-XXXX`"
         )
@@ -96,22 +96,22 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
         # Dukungan legacy untuk ADMIN_SECRET lama, jika terpaksa
         if config.ADMIN_SECRET and code == config.ADMIN_SECRET.upper():
             until = storage.activate_premium(chat_id, config.PREMIUM_DURATION_DAYS)
-            notifier.send_message(chat_id, f"o. [LEGACY] Premium aktif sampai {until[:10]}. Segera gunakan sistem voucher baru.")
+            notifier.send_message(chat_id, f"✅ [LEGACY] Premium aktif sampai {until[:10]}. Segera gunakan sistem voucher baru.")
             return
 
         success, msg = storage.claim_voucher(code, chat_id)
         if success:
-            notifier.send_message(chat_id, f"dY'Z *SELAMAT!* Akunmu sudah Premium.\nBerlaku sampai: {msg[:10]}", parse_mode="Markdown")
+            notifier.send_message(chat_id, f"💎 *SELAMAT!* Akunmu sudah Premium.\nBerlaku sampai: {msg[:10]}", parse_mode="Markdown")
             # Beritahu admin ada yang aktivasi
             if config.TELEGRAM_ADMIN_CHAT_ID:
-                notifier.send_message(config.TELEGRAM_ADMIN_CHAT_ID, f"dY'Z Aktivasi Voucher: @{username} (ID:{chat_id}) memakai {code}")
+                notifier.send_message(config.TELEGRAM_ADMIN_CHAT_ID, f"💎 Aktivasi Voucher: @{username} (ID:{chat_id}) memakai {code}")
         else:
-            notifier.send_message(chat_id, f"?O Gagal: {msg}")
+            notifier.send_message(chat_id, f"❌ Gagal: {msg}")
 
     elif cmd == "/status":
         if storage.is_premium(chat_id):
             row = storage.get_subscriber(chat_id)
-            notifier.send_message(chat_id, f"o. *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown")
+            notifier.send_message(chat_id, f"✅ *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown")
         else:
             notifier.send_message(chat_id, "Kamu pengguna FREE. Ketik /premium untuk upgrade.")
 

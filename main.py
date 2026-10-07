@@ -31,12 +31,12 @@ def _setup_logging() -> None:
 
 
 def build_summary(signals: list[analyzer.Signal]) -> str:
-    header = f"dYT Ringkasan Harga ({datetime.now():%Y-%m-%d %H:%M})\n"
+    header = f"🤖 Ringkasan Harga ({datetime.now():%Y-%m-%d %H:%M})\n"
     body = "\n".join(s.format_line() for s in signals)
     alerts = analyzer.only_alerts(signals)
     whales = [s for s in alerts if s.is_whale]
     
-    footer = f"\n\ns,? {len(alerts)} sinyal alert ({len(whales)} Whale Detected)."
+    footer = f"\n\n⚠️ {len(alerts)} sinyal alert ({len(whales)} Whale Detected)."
     return f"{header}\n{body}{footer}"
 
 
@@ -83,7 +83,7 @@ def run_once() -> int:
     # Alert detail VIP hanya ke premium
     alerts = analyzer.only_alerts(signals)
     if alerts:
-        alert_text = "dYs" *VIP SIGNAL ALERT*\n\n" + "\n\n".join(
+        alert_text = "🚨" *VIP SIGNAL ALERT*\n\n" + "\n\n".join(
             s.format_line() for s in alerts
         )
         for sub in storage.all_subscribers(premium_only=True):
