@@ -69,8 +69,8 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             body = "\n".join(lines[:1])
             tail = (
                 "\n\n_...Sinyal ini terlambat 15 menit._\n"
-                "dYs" *3 Koin lain sedang mengalami lonjakan volume tinggi (Whale Alert)!*\n"
-                "dY"' Upgrade ke Premium (Rp 25.000/bln) untuk akses Real-Time & Volume Scanner. Ketik /premium"
+                "🚨 *3 Koin lain sedang mengalami lonjakan volume tinggi (Whale Alert)!*\n"
+                "💎 Upgrade ke Premium (Rp 25.000/bln) untuk akses Real-Time & Volume Scanner. Ketik /premium"
             )
             notifier.send_message(chat_id, body + tail, parse_mode="Markdown")
 
