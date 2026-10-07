@@ -92,8 +92,10 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             f"✅ Auto-Chart: Otomatis kirim grafik gambar saat ada lonjakan!\n"
             f"✅ Alert Whale & Volume Spike Real-time\n"
             f"✅ Unlock semua koin crypto\n\n"
-            f"Cara Bayar: Transfer ke BCA (Hubungi Admin).\n"
-            f"Setelah dapat kode voucher, ketik di chat ini:\n`/aktivasi PREM-XXXX`"
+            f"🛒 *Beli Otomatis 24 Jam:*\n"
+            f"Klik link 👉 https://lynk.id/whaleradar\n\n"
+            f"Setelah bayar via QRIS/GoPay, Anda akan mendapat kode voucher.\n"
+            f"Ketik kodenya di chat ini:\n`/aktivasi PREM-XXXX`"
         )
         notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
