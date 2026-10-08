@@ -41,15 +41,19 @@ def init_db() -> None:
                 change_24h REAL NOT NULL,
                 volume_24h REAL DEFAULT 0,
                 recorded_at TEXT NOT NULL
-            );
+            )
+        try:
+            conn.execute("ALTER TABLE subscribers ADD COLUMN has_trial INTEGER DEFAULT 0")
+        except Exception:
+            pass
+;
 
             CREATE TABLE IF NOT EXISTS subscribers (
                 chat_id TEXT PRIMARY KEY,
                 username TEXT,
                 plan TEXT NOT NULL DEFAULT 'free',
                 premium_until TEXT,
-                joined_at TEXT NOT NULL,
-                has_trial INTEGER DEFAULT 0
+                joined_at TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS vouchers (
@@ -60,13 +64,6 @@ def init_db() -> None:
                 created_at TEXT NOT NULL
             );
 
-            
-            try:
-                conn.execute("ALTER TABLE subscribers ADD COLUMN has_trial INTEGER DEFAULT 0")
-            except sqlite3.OperationalError:
-                pass # Kolom sudah ada
-            
-            conn.executescript("""
             CREATE INDEX IF NOT EXISTS idx_price_coin_time
                 ON price_history (coin, recorded_at);
             """
