@@ -48,6 +48,7 @@ def _get_list(name: str, default: str = "") -> list[str]:
 # --- Telegram ---
 TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_ADMIN_CHAT_ID = _get("TELEGRAM_ADMIN_CHAT_ID")
+TELEGRAM_CHANNEL_ID = _get("TELEGRAM_CHANNEL_ID", "@WhaleCryptoFree")
 
 # --- Sumber data (CoinGecko, tanpa API key) ---
 COINS = _get_list("COINS", "bitcoin,ethereum,solana")
