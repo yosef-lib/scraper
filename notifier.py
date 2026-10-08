@@ -57,3 +57,14 @@ def send_document(chat_id: str, file_path: str, caption: str = "") -> bool:
         return resp.status_code == 200
     except (requests.RequestException, OSError) as exc:
         return False
+
+def forward_message(chat_id: str, from_chat_id: str, message_id: int) -> bool:
+    if not config.TELEGRAM_BOT_TOKEN:
+        return False
+    url = f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/forwardMessage"
+    payload = {"chat_id": chat_id, "from_chat_id": from_chat_id, "message_id": message_id}
+    try:
+        resp = requests.post(url, json=payload, timeout=20)
+        return resp.status_code == 200
+    except requests.RequestException:
+        return False

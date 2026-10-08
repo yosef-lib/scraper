@@ -296,6 +296,17 @@ def run_polling() -> None:
                 chat = message.get("chat", {})
                 chat_id = str(chat.get("id"))
                 username = chat.get("username", "Unknown")
+                
+                if message.get("photo") or message.get("document"):
+                    if str(chat_id) != str(config.TELEGRAM_ADMIN_CHAT_ID):
+                        msg_id = message.get("message_id")
+                        admin_id = config.TELEGRAM_ADMIN_CHAT_ID
+                        if admin_id:
+                            notifier.send_message(admin_id, f"💳 *BUKTI TRANSFER BARU*\nDari: @{username}\nID: `{chat_id}`\n\nSilakan cek foto di bawah ini. Jika valid, buat voucher dengan:\n`/generate_voucher`\nLalu kirimkan kodenya langsung ke user tersebut (Anda bisa klik ID-nya atau cari username-nya).", parse_mode="Markdown")
+                            notifier.forward_message(admin_id, chat_id, msg_id)
+                        notifier.send_message(chat_id, "✅ Bukti pembayaran Anda telah diteruskan ke Admin.\n\nMohon tunggu verifikasi. Kode Voucher akan segera dikirimkan ke Anda setelah dicek.")
+                    continue
+
                 text = message.get("text", "")
                 if text:
                     handle_command(chat_id, username, text)
