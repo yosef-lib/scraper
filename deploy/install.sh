@@ -35,17 +35,19 @@ else
 fi
 
 echo "[4/5] Install systemd service + timer"
-cp "$APP_DIR/deploy/scraper.service" "$APP_DIR/deploy/scraper.timer" "$APP_DIR/deploy/bot.service" "$SERVICE_DIR/"
+cp "$APP_DIR/deploy/scraper.service" "$APP_DIR/deploy/scraper.timer" "$APP_DIR/deploy/bot.service" "$APP_DIR/deploy/marketing.service" "$SERVICE_DIR/"
 systemctl daemon-reload
-systemctl enable --now scraper.timer bot.service
+systemctl enable --now scraper.timer bot.service marketing.service
 
 echo "[5/5] Status"
 systemctl list-timers | grep -i scraper || true
 systemctl is-active bot.service || journalctl -u bot.service --no-pager -n 20 || true
+systemctl is-active marketing.service || journalctl -u marketing.service --no-pager -n 20 || true
 
 echo ""
 echo "Selesai. Uji manual:"
 echo "  $APP_DIR/.venv/bin/python $APP_DIR/main.py"
 echo "Lihat log:"
 echo "  journalctl -u bot.service -f"
+echo "  journalctl -u marketing.service -f"
 echo "  journalctl -u scraper.service --no-pager -n 50"

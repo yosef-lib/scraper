@@ -1,0 +1,15 @@
+[Unit]
+Description=Whale Crypto Marketing Bot
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/crypto-signal
+ExecStart=/opt/crypto-signal/.venv/bin/python /opt/crypto-signal/marketing_bot.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/opt/crypto-signal/.env
+
+[Install]
+WantedBy=multi-user.target
