@@ -18,10 +18,12 @@ DEX_API = "https://api.dexscreener.com/latest/dex"
 def get_trending_pairs(chain: str = "solana", min_vol_usd: float = 500_000) -> list[dict]:
     """Ambil pasangan trading yang sedang trending di chain tertentu."""
     try:
-        url = f"{DEX_API}/tokens/trending"
+        url = f"{DEX_API}/search?q={chain}"
         resp = requests.get(url, timeout=15)
         data = resp.json()
         pairs = data.get("pairs", [])
+        if not pairs:
+            return []
         
         # Filter: chain yang diminta & volume cukup besar
         result = []

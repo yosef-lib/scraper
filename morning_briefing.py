@@ -87,19 +87,22 @@ def run_morning_briefing():
     for p in losers:
         losers_text += f"  🔴 *{p.coin.upper()}* {p.change_24h:+.2f}%\n"
 
+    sep = "─" * 28
+    gainers_str = gainers_text if gainers_text else "  N/A\n"
+    losers_str = losers_text if losers_text else "  N/A\n"
     msg = (
-        f"☀️ *SELAMAT PAGI! — BRIEFING KRIPTO*\n"
-        f"📅 {today}\n\n"
-        f"{'─'*28}\n"
-        f"{fg_emoji} *Fear & Greed Index:*\n"
-        f"  {fg_text}\n\n"
-        f"🚀 *Top Gainers 24h:*\n{gainers_text if gainers_text else '  N/A\n'}\n"
-        f"📉 *Top Losers 24h:*\n{losers_text if losers_text else '  N/A\n'}\n"
-        f"{'─'*28}\n"
-        f"💡 *Tips Hari Ini:*\n{tips}\n\n"
-        f"🤖 Ingin sinyal *ENTRY + TP + SL* otomatis?\n"
-        f"👉 Upgrade ke VIP: https://lynk.id/whaleradar\n"
-        f"🎫 Atau coba *GRATIS 24 JAM* langsung di bot: @WhaleCryptoVIP_bot"
+        "☀️ *SELAMAT PAGI! — BRIEFING KRIPTO*\n"
+        "📅 " + today + "\n\n" +
+        sep + "\n" +
+        fg_emoji + " *Fear & Greed Index:*\n"
+        "  " + fg_text + "\n\n"
+        "🚀 *Top Gainers 24h:*\n" + gainers_str + "\n"
+        "📉 *Top Losers 24h:*\n" + losers_str + "\n" +
+        sep + "\n"
+        "💡 *Tips Hari Ini:*\n" + tips + "\n\n"
+        "🤖 Ingin sinyal *ENTRY + TP + SL* otomatis?\n"
+        "👉 Upgrade ke VIP: https://lynk.id/whaleradar\n"
+        "🎫 Atau coba *GRATIS 24 JAM* langsung di bot: @WhaleCryptoVIP_bot"
     )
 
     notifier.send_message(channel_id, msg, parse_mode="Markdown")
