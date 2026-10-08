@@ -195,18 +195,26 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             notifier.send_message(chat_id, "❌ Gagal memindai radar global saat ini.", reply_markup=keyboard)
 
     elif cmd == "/premium":
-        msg = (
-            f"💎 *Akses Premium VIP*\n\n"
-            f"Harga Promo: *Rp 50.000* / 30 hari\n"
-            f"Fitur VIP:\n"
-            f"✅ Auto-Chart: Kirim grafik saat volume melonjak!\n"
-            f"✅ On-Demand Chart: Bebas minta grafik 24 jam!\n"
-            f"✅ Akses Real-Time Top 20 Koin\n\n"
-            f"👉 *Beli Otomatis 24 Jam:*\n"
-            f"Klik link: https://lynk.id/whaleradar\n\n"
-            f"Setelah bayar via QRIS/GoPay, Anda akan mendapat kode voucher.\n"
-            f"Ketik kodenya di chat ini:\n`/aktivasi PREM-XXXX`"
-        )
+        msg = """💎 *AKSES PREMIUM WHALE CRYPTO VIP*
+
+Harga Promo: *Rp 50.000* / 30 Hari
+
+───────────────────
+💳 *METODE PEMBAYARAN:*
+
+1️⃣ *TRANSFER BANK (Bebas Biaya Admin):*
+🏦 Bank Mandiri: `1420019877454`
+👤 a.n: YOSEF PASKAH WAHYUTO
+
+2️⃣ *OTOMATIS 24 JAM (QRIS / E-Wallet):*
+👉 https://lynk.id/whaleradar
+───────────────────
+
+📩 *SETELAH TRANSFER MANUAL:*
+Kirim bukti transfer ke Admin untuk mendapatkan Kode Voucher Aktivasi.
+
+Jika sudah menerima kode voucher, ketik di chat ini:
+`/aktivasi PREM-XXXX`"""
         notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/aktivasi":
