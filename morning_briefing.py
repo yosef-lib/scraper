@@ -101,8 +101,8 @@ def run_morning_briefing():
         sep + "\n"
         "💡 *Tips Hari Ini:*\n" + tips + "\n\n"
         "🤖 Ingin sinyal *ENTRY + TP + SL* otomatis?\n"
-        "👉 Upgrade ke VIP: https://lynk.id/whaleradar\n"
-        "🎫 Atau coba *GRATIS 24 JAM* langsung di bot: @WhaleCryptoVIP_bot"
+        "👉 Upgrade ke VIP: Bank Mandiri: 1420019877454 a.n YOSEF PASKAH WAHYUTO\n"
+        "🎫 Atau coba *GRATIS 24 JAM* langsung di bot: @scraping26bot"
     )
 
     notifier.send_message(channel_id, msg, parse_mode="Markdown")

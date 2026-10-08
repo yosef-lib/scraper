@@ -155,7 +155,7 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
 
     elif cmd == "/referral":
         count = storage.get_referral_count(chat_id)
-        ref_link = f"https://t.me/WhaleCryptoVIP_bot?start=REF{chat_id}"
+        ref_link = f"https://t.me/scraping26bot?start=REF{chat_id}"
         bonus_days = count * 7
         msg = (
             f"🤝 *PROGRAM REFERRAL VIP*\n\n"

@@ -202,7 +202,7 @@ def handle_command(chat_id, text):
             f"Koin {coin_name} menunjukkan pergerakan signifikan hari ini!\n"
             f"Lonjakan volume terdeteksi oleh AI Whale Radar (+{gain:.1f}%).\n\n"
             f"Ingin sinyal lengkap dengan Entry, TP & Stop Loss?\n"
-            f"👉 Klaim FREE TRIAL 24 Jam: @WhaleCryptoVIP_bot"
+            f"👉 Klaim FREE TRIAL 24 Jam: @scraping26bot"
         )
         ok = broadcast_to_free(pesan)
         send_msg(chat_id, "✅ Broadcast 'Update Sinyal' berhasil dikirim ke Channel Gratis!" if ok else "❌ Gagal broadcast. Coba lagi.")
@@ -214,7 +214,7 @@ def handle_command(chat_id, text):
             "Dapatkan akses GRATIS ke Bot AI Whale Crypto selama 24 Jam!\n\n"
             "Pantau sinyal Smart Money + Entry + Target Profit otomatis.\n\n"
             "Caranya gampang:\n"
-            "1. Buka @WhaleCryptoVIP_bot\n"
+            "1. Buka @scraping26bot\n"
             "2. Klik tombol [Klaim Free Trial]\n"
             "3. Nikmati sinyal VIP 24 Jam GRATIS!\n\n"
             "Jangan sampai ketinggalan 🚀"
@@ -230,7 +230,7 @@ def handle_command(chat_id, text):
             f"Pergerakan hari ini: +{gain:.1f}%\n\n"
             f"Anggota VIP sudah menerima sinyal Entry & Target Profit-nya sejak awal.\n\n"
             f"Mau ikut next signal?\n"
-            f"👉 Coba GRATIS 24 Jam di @WhaleCryptoVIP_bot"
+            f"👉 Coba GRATIS 24 Jam di @scraping26bot"
         )
         ok = broadcast_to_free(pesan)
         send_msg(chat_id, "✅ Broadcast 'Koin Terbang' berhasil dikirim!" if ok else "❌ Gagal broadcast.")

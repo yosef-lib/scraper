@@ -63,7 +63,7 @@ def run_weekly_report():
         f"Top 3 Koin Paling Cuan Minggu Ini:\\n{coins_text}\\n"
         f"Para **Member VIP** kami sudah mendapatkan notifikasi koin-koin di atas *jauh sebelum* publik menyadarinya.\\n\\n"
         f"Masih mau jadi penonton minggu depan? 👀\\n"
-        f"💎 *Upgrade VIP Sekarang:* https://lynk.id/whaleradar"
+        f"💎 *Upgrade VIP Sekarang:* Bank Mandiri: 1420019877454 a.n YOSEF PASKAH WAHYUTO"
     )
     
     msg = msg.replace('\\n', '\n')

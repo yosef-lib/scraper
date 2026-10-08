@@ -96,7 +96,7 @@ def run_dex_radar(broadcast: bool = True) -> int:
         "⚠️ *DISCLAIMER:* Meme coin sangat berisiko tinggi. "
         "Sinyal ini bukan anjuran investasi — hanya data pasar.\n\n"
         "🤖 Ingin sinyal *Entry + TP + SL* untuk koin ini?\n"
-        "👉 https://lynk.id/whaleradar"
+        "👉 Bank Mandiri: 1420019877454 a.n YOSEF PASKAH WAHYUTO"
     )
 
     msg = header + body + footer
