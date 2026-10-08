@@ -48,7 +48,8 @@ def init_db() -> None:
                 username TEXT,
                 plan TEXT NOT NULL DEFAULT 'free',
                 premium_until TEXT,
-                joined_at TEXT NOT NULL
+                joined_at TEXT NOT NULL,
+                has_trial INTEGER DEFAULT 0
             );
 
             CREATE TABLE IF NOT EXISTS vouchers (
@@ -59,6 +60,13 @@ def init_db() -> None:
                 created_at TEXT NOT NULL
             );
 
+            
+            try:
+                conn.execute("ALTER TABLE subscribers ADD COLUMN has_trial INTEGER DEFAULT 0")
+            except sqlite3.OperationalError:
+                pass # Kolom sudah ada
+            
+            conn.executescript("""
             CREATE INDEX IF NOT EXISTS idx_price_coin_time
                 ON price_history (coin, recorded_at);
             """
@@ -182,4 +190,15 @@ def claim_voucher(code: str, chat_id: str) -> tuple[bool, str]:
         
     # Aktivasi akunnya
     until = activate_premium(chat_id, row["days"])
+    return True, until
+
+def claim_trial(chat_id: str) -> tuple[bool, str]:
+    upsert_subscriber(chat_id)
+    row = get_subscriber(chat_id)
+    if row and row.get("has_trial"):
+        return False, "Anda sudah pernah mengklaim Free Trial."
+        
+    until = activate_premium(chat_id, 1)
+    with get_conn() as conn:
+        conn.execute("UPDATE subscribers SET has_trial = 1 WHERE chat_id = ?", (str(chat_id),))
     return True, until

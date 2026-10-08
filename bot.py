@@ -11,6 +11,7 @@ import config
 import notifier
 import sources
 import storage
+from main import generate_chart_url
 
 log = logging.getLogger("bot")
 
@@ -18,8 +19,8 @@ def get_main_keyboard():
     """Mengembalikan custom keyboard (tombol besar di bawah)."""
     return {
         "keyboard": [
-            [{"text": "💰 Cek Harga"}, {"text": "💎 Beli Premium"}],
-            [{"text": "👤 Status Akun"}],
+            [{"text": "🎫 Klaim Free Trial"}, {"text": "📈 Cek Grafik Koin"}],
+            [{"text": "💎 Upgrade VIP"}, {"text": "👤 Status Akun"}],
         ],
         "resize_keyboard": True,
         "is_persistent": True
@@ -27,8 +28,7 @@ def get_main_keyboard():
 
 HELP_TEXT = (
     "🤖 *Bot Sinyal Harga VIP*\n\n"
-    "Gunakan tombol di bawah untuk navigasi, atau ketik manual:\n"
-    "/aktivasi <kode> - Aktifkan premium\n"
+    "Gunakan tombol di bawah untuk navigasi cepat."
 )
 
 def _api(method: str, **params):
@@ -45,9 +45,11 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     cmd = parts[0].lower() if parts else ""
 
     # Map text dari tombol ke command logic
-    if text == "💰 Cek Harga":
-        cmd = "/harga"
-    elif text == "💎 Beli Premium":
+    if text == "🎫 Klaim Free Trial":
+        cmd = "/trial"
+    elif text == "📈 Cek Grafik Koin":
+        cmd = "/helpchart"
+    elif text == "💎 Upgrade VIP":
         cmd = "/premium"
     elif text == "👤 Status Akun":
         cmd = "/status"
@@ -55,45 +57,71 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     keyboard = get_main_keyboard()
 
     if cmd == "/start":
-        notifier.send_message(chat_id, HELP_TEXT, parse_mode="Markdown", reply_markup=keyboard)
+        msg = (
+            "🚀 *Selamat datang di Whale Crypto VIP!*\n\n"
+            "Gunakan tombol menu di bagian bawah layar untuk mulai menggunakan fitur bot."
+        )
+        notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
-    elif cmd == "/harga":
-        prices = sources.fetch_prices()
-        if not prices:
-            notifier.send_message(chat_id, "Maaf, gagal mengambil harga.", reply_markup=keyboard)
-            return
-        
-        premium = storage.is_premium(chat_id)
-        lines = []
-        for p in prices:
-            if premium:
-                vol_m = p.volume_24h / 1_000_000 if p.volume_24h else 0
-                lines.append(f"💎 {p.coin.upper()}: {p.price:,.2f} ({p.change_24h:+.2f}%) | Vol: ${vol_m:,.1f}M")
-            else:
-                lines.append(f"🟢 {p.coin.upper()}: {p.price:,.2f}")
-        
-        if premium:
-            body = "\n".join(lines)
-            notifier.send_message(chat_id, "🤖 *Laporan Premium*\n" + body, parse_mode="Markdown", reply_markup=keyboard)
+    elif cmd == "/trial":
+        success, msg = storage.claim_trial(chat_id)
+        if success:
+            notifier.send_message(chat_id, f"🎉 *SELAMAT!*\nAnda telah mengaktifkan **Free Trial 24 Jam**.\nBerlaku sampai: {msg[:10]}\n\nAnda sekarang memiliki akses penuh ke fitur On-Demand Chart dan notifikasi Real-Time!", parse_mode="Markdown", reply_markup=keyboard)
+            if config.TELEGRAM_ADMIN_CHAT_ID:
+                notifier.send_message(config.TELEGRAM_ADMIN_CHAT_ID, f"🔔 *TRIAL DIKLAIM* oleh @{username} (ID:{chat_id})", parse_mode="Markdown")
         else:
-            body = "\n".join(lines[:1])
-            tail = (
-                "\n\n_...Sinyal ini terlambat 15 menit._\n"
-                "🚨 *3 Koin lain sedang mengalami lonjakan volume tinggi (Smart Money Alert)!*\n"
-                "👉 Upgrade Premium untuk akses Real-Time & Volume Scanner."
-            )
-            notifier.send_message(chat_id, body + tail, parse_mode="Markdown", reply_markup=keyboard)
+            notifier.send_message(chat_id, f"❌ {msg}", reply_markup=keyboard)
+
+    elif cmd == "/helpchart":
+        msg = (
+            "📈 *FITUR ON-DEMAND CHART*\n\n"
+            "Untuk memanggil grafik secara Real-Time, ketik perintah `/chart` diikuti simbol koinnya.\n\n"
+            "Contoh:\n"
+            "`/chart btc`\n"
+            "`/chart sol`\n"
+            "`/chart pepe`"
+        )
+        notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
+
+    elif cmd == "/chart":
+        if not storage.is_premium(chat_id):
+            notifier.send_message(chat_id, "⚠️ Fitur On-Demand Chart hanya untuk Member VIP atau Trial. Klik [Klaim Free Trial] untuk mencoba!", reply_markup=keyboard)
+            return
+            
+        if len(parts) < 2:
+            notifier.send_message(chat_id, "Format salah. Gunakan: `/chart btc`", parse_mode="Markdown", reply_markup=keyboard)
+            return
+            
+        coin_input = parts[1].lower()
+        # Pemetaan sederhana
+        coin_map = {
+            "btc": "bitcoin", "eth": "ethereum", "sol": "solana", "bnb": "binancecoin", 
+            "xrp": "ripple", "ada": "cardano", "avax": "avalanche-2", "doge": "dogecoin", 
+            "trx": "tron", "dot": "polkadot", "link": "chainlink", "matic": "polygon", 
+            "ton": "toncoin", "shib": "shiba-inu", "ltc": "litecoin", "pepe": "pepe", 
+            "near": "near", "apt": "aptos", "arb": "arbitrum", "sui": "sui"
+        }
+        coin_id = coin_map.get(coin_input, coin_input)
+        
+        notifier.send_message(chat_id, f"⏳ Sedang memproses grafik untuk {coin_id.upper()}...")
+        chart_data = sources.fetch_market_chart(coin_id, days=1)
+        
+        if chart_data:
+            chart_url = generate_chart_url(coin_id, chart_data)
+            notifier.send_photo(chat_id, chart_url, caption=f"📊 Grafik 24 Jam: *{coin_id.upper()}*", parse_mode="Markdown", reply_markup=keyboard)
+        else:
+            notifier.send_message(chat_id, f"❌ Gagal mendapatkan data untuk koin {coin_id.upper()}. Pastikan nama koin valid (contoh: btc, sol, ethereum).", reply_markup=keyboard)
 
     elif cmd == "/premium":
         msg = (
-            f"💎 *Akses Premium*\n\n"
+            f"💎 *Akses Premium VIP*\n\n"
             f"Harga Promo: *Rp 50.000* / 30 hari\n"
             f"Fitur VIP:\n"
-            f"✅ Auto-Chart: Otomatis kirim grafik gambar saat ada lonjakan!\n"
-            f"✅ Alert Smart Money & Volume Spike Real-time\n"
-            f"✅ Unlock semua koin crypto\n\n"
-            f"🛒 *Beli Otomatis 24 Jam:*\n"
-            f"Klik link 👉 https://lynk.id/whaleradar\n\n"
+            f"✅ Auto-Chart: Kirim grafik saat volume melonjak!\n"
+            f"✅ On-Demand Chart: Bebas minta grafik 24 jam!\n"
+            f"✅ Akses Real-Time Top 20 Koin\n\n"
+            f"👉 *Beli Otomatis 24 Jam:*\n"
+            f"Klik link: https://lynk.id/whaleradar\n\n"
             f"Setelah bayar via QRIS/GoPay, Anda akan mendapat kode voucher.\n"
             f"Ketik kodenya di chat ini:\n`/aktivasi PREM-XXXX`"
         )
@@ -116,9 +144,9 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     elif cmd == "/status":
         if storage.is_premium(chat_id):
             row = storage.get_subscriber(chat_id)
-            notifier.send_message(chat_id, f"✅ *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown", reply_markup=keyboard)
+            notifier.send_message(chat_id, f"👤 *Status: PREMIUM/TRIAL*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown", reply_markup=keyboard)
         else:
-            notifier.send_message(chat_id, "Kamu pengguna FREE. Klik tombol [Beli Premium] untuk upgrade.", reply_markup=keyboard)
+            notifier.send_message(chat_id, "Anda pengguna FREE. Klik tombol [Klaim Free Trial] untuk mencoba fitur VIP.", reply_markup=keyboard)
 
     elif cmd == "/generate_voucher":
         if str(chat_id) != str(config.TELEGRAM_ADMIN_CHAT_ID):
@@ -130,9 +158,9 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     else:
         # Jika bukan command, anggap ngobrol biasa
         if not text.startswith("/"):
-            notifier.send_message(chat_id, "Gunakan tombol di bawah untuk menu cepat 👇", reply_markup=keyboard)
+            notifier.send_message(chat_id, "Gunakan tombol menu cepat di bawah ini 👇", reply_markup=keyboard)
         else:
-            notifier.send_message(chat_id, "Perintah tidak dikenal.\n\n" + HELP_TEXT, parse_mode="Markdown", reply_markup=keyboard)
+            notifier.send_message(chat_id, "Perintah tidak dikenal.", parse_mode="Markdown", reply_markup=keyboard)
 
 def run_polling() -> None:
     config.require_telegram()
