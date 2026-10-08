@@ -11,12 +11,25 @@ log = logging.getLogger(__name__)
 MARKETING_TOKEN = os.getenv("MARKETING_BOT_TOKEN")
 API_URL = f"{config.TELEGRAM_API}/bot{MARKETING_TOKEN}"
 
-def send_msg(chat_id, text, parse_mode=None):
+keyboard = {
+    "keyboard": [
+        [{"text": "📱 Draft Threads"}, {"text": "📸 Draft IG Story"}],
+        [{"text": "⚔️ Roast Competitor"}]
+    ],
+    "resize_keyboard": True,
+    "persistent": True
+}
+
+def send_msg(chat_id, text, parse_mode=None, reply_markup=None):
     if not MARKETING_TOKEN:
         return
     payload = {"chat_id": chat_id, "text": text}
     if parse_mode:
         payload["parse_mode"] = parse_mode
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
+    else:
+        payload["reply_markup"] = keyboard
     requests.post(f"{API_URL}/sendMessage", json=payload)
 
 def handle_command(chat_id, text):
@@ -38,15 +51,13 @@ def handle_command(chat_id, text):
     if cmd == "/start":
         msg = (
             "🎯 *WHALE MARKETING CONTROL CENTER* 🎯\n\n"
-            "Pilih amunisi promosi Anda hari ini:\n"
-            "👉 `/draft_threads` - Hook & Storytelling\n"
-            "👉 `/draft_ig` - Singkat, padat (IG Story)\n"
-            "👉 `/roast_competitor` - Serang kelemahan grup VIP sebelah\n"
-            "👉 `/bom_free <pesan>` - Broadcast instan ke Channel Gratis"
+            "Gunakan tombol di bawah untuk menghasilkan teks promosi secara otomatis.\n\n"
+            "*(Untuk broadcast manual ke Channel Gratis, ketik:)*\n"
+            "`/bom_free Halo warga channel...`"
         )
         send_msg(chat_id, msg, "Markdown")
 
-    elif cmd == "/draft_threads":
+    elif cmd == "/draft_threads" or text.startswith("📱"):
         templates = [
             f"Iseng bikin Bot AI pelacak pergerakan Smart Money (Whale) di kripto. Pagi tadi bunyi di {coin_name}, eh sekarang beneran terbang +{gain:.1f}%. Mau nyobain botnya gratis 24 jam? Cek link di bio ya!",
             f"Stop trading pakai firasat. Tadi pagi AI nangkap sinyal {coin_name} pas masih sepi, sekarang udah meroket +{gain:.1f}%. Tes keakuratan AI kita GRATIS 24 jam, klik link di bio!",
@@ -54,14 +65,14 @@ def handle_command(chat_id, text):
         ]
         send_msg(chat_id, random.choice(templates) + "\n\n#crypto #bitcoin #cuan")
 
-    elif cmd == "/draft_ig":
+    elif cmd == "/draft_ig" or text.startswith("📸"):
         templates = [
             f"🔥 {coin_name} NAIK +{gain:.1f}% HARI INI! 🔥\n\nMember VIP udah cuan dari pagi berkat radar AI. Yang masih manual pasti ketinggalan.\n\nKlik link di bio buat FREE TRIAL 24 Jam! 🚀",
             f"Sinyal {coin_name} sukses hit Target Profit (+{gain:.1f}%)! 🎯\nTrading gampang kalau ngikutin pergerakan Uang Besar.\n\nLink di bio untuk coba bot gratis."
         ]
         send_msg(chat_id, random.choice(templates))
 
-    elif cmd == "/roast_competitor":
+    elif cmd == "/roast_competitor" or text.startswith("⚔️"):
         templates = [
             f"Capek ikut grup VIP Crypto yang adminnya suka lepas tangan pas koin nyungsep? 📉 Tinggalkan cara lama. Saatnya beralih ke AI Whale Radar. Kita hitung titik Entry sampai Stop Loss pakai matematika, bukan firasat. Hari ini terbukti di {coin_name} (+{gain:.1f}%). Coba gratis 24 jam botnya di bio!",
             f"Beda grup biasa vs Whale Crypto AI:\n❌ Grup biasa cuma kasih tebakan tanpa Stop Loss.\n✅ Whale AI ngasih Entry, TP, dan SL matematis.\n\nHari ini {coin_name} tembus +{gain:.1f}% dengan presisi. Coba gratis di link bio!",
@@ -75,7 +86,6 @@ def handle_command(chat_id, text):
             send_msg(chat_id, "Format salah. Gunakan:\n`/bom_free Halo semua ini update terbaru...`", "Markdown")
             return
         
-        # Kirim pakai bot utama agar seolah-olah dikirim oleh Whale Crypto VIP
         url_main = f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/sendMessage"
         payload = {"chat_id": config.TELEGRAM_CHANNEL_ID, "text": pesan}
         try:
@@ -88,7 +98,7 @@ def handle_command(chat_id, text):
             send_msg(chat_id, f"❌ Error: {e}")
 
     else:
-        send_msg(chat_id, "Perintah tidak dikenal. Ketik /start untuk melihat menu.")
+        send_msg(chat_id, "Gunakan tombol menu di bawah 👇")
 
 def run():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
