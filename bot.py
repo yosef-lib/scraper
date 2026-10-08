@@ -195,26 +195,22 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             notifier.send_message(chat_id, "❌ Gagal memindai radar global saat ini.", reply_markup=keyboard)
 
     elif cmd == "/premium":
-        msg = """💎 *AKSES PREMIUM WHALE CRYPTO VIP*
-
-Harga Promo: *Rp 50.000* / 30 Hari
-
-───────────────────
-💳 *METODE PEMBAYARAN:*
-
-1️⃣ *TRANSFER BANK (Bebas Biaya Admin):*
-🏦 Bank Mandiri: `1420019877454`
-👤 a.n: YOSEF PASKAH WAHYUTO
-
-2️⃣ *OTOMATIS 24 JAM (QRIS / E-Wallet):*
-👉 https://lynk.id/whaleradar
-───────────────────
-
-📩 *SETELAH TRANSFER MANUAL:*
-Kirim bukti transfer ke Admin untuk mendapatkan Kode Voucher Aktivasi.
-
-Jika sudah menerima kode voucher, ketik di chat ini:
-`/aktivasi PREM-XXXX`"""
+        msg = (
+            "💎 *AKSES PREMIUM WHALE CRYPTO VIP*\n\n"
+            "Harga Promo: *Rp 50.000* / 30 Hari\n\n"
+            "───────────────────\n"
+            "💳 *METODE PEMBAYARAN:*\n\n"
+            "🏦 Bank Mandiri: `1420019877454`\n"
+            "👤 a.n: YOSEF PASKAH WAHYUTO\n\n"
+            "*(Bebas Biaya Admin, 100% Aman)*\n"
+            "───────────────────\n\n"
+            "📩 *CARA AKTIVASI VIP:*\n"
+            "1. Lakukan transfer Rp 50.000 ke rekening Mandiri di atas.\n"
+            "2. Kirim screenshot bukti transfer ke Admin via chat.\n"
+            "3. Admin akan memberikan Kode Voucher VIP Anda.\n\n"
+            "Jika sudah menerima kode voucher, ketik di chat ini:\n"
+            "`/aktivasi PREM-XXXX`"
+        )
         notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/aktivasi":
