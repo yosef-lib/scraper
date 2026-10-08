@@ -1,4 +1,4 @@
-﻿"""Entrypoint siklus harian/berkala.
+"""Entrypoint siklus harian/berkala.
 
 Alur:
 1. ambil harga dari sumber
@@ -63,18 +63,15 @@ def generate_chart_url(coin: str, prices: list[float]) -> str:
 def build_summary(signals: list[analyzer.Signal]) -> str:
     wib = timezone(timedelta(hours=7))
     now_str = datetime.now(wib).strftime("%d-%m-%Y %H:%M WIB")
-    header = f"📊 *Ringkasan Harga* ({now_str})
-"
-    body = "
-".join(s.format_line() for s in signals)
+    header = f"📊 *Ringkasan Harga* ({now_str})\\n"
+    body = "\\n".join(s.format_line() for s in signals)
     alerts = analyzer.only_alerts(signals)
     whales = [s for s in alerts if s.is_whale]
     
-    footer = f"
-
-⚠️ {len(alerts)} sinyal alert ({len(whales)} Lonjakan Volume)."
-    return f"{header}
-{body}{footer}"
+    footer = f"\\n\\n⚠️ {len(alerts)} sinyal alert ({len(whales)} Lonjakan Volume)."
+    
+    msg = f"{header}\\n{body}{footer}"
+    return msg.replace('\\n', '\n')
 
 def export_csv(signals: list[analyzer.Signal]) -> str:
     filename = config.BASE_DIR / "hasil_harga.csv"
@@ -120,7 +117,8 @@ def run_once() -> int:
     if alerts:
         subs = storage.all_subscribers(premium_only=True)
         for s in alerts:
-            alert_text = f"ðŸš¨ *VIP SIGNAL ALERT*\n\n{s.format_line()}"
+            alert_text = f"🚨 *VIP SIGNAL ALERT*\\n\\n{s.format_line()}"
+            alert_text = alert_text.replace('\\n', '\n')
             # Fetch chart
             chart_data = sources.fetch_market_chart(s.coin, days=1)
             if chart_data:
@@ -138,4 +136,3 @@ def run_once() -> int:
 if __name__ == "__main__":
     _setup_logging()
     sys.exit(run_once())
-
