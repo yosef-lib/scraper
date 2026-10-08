@@ -20,7 +20,8 @@ def get_main_keyboard():
     return {
         "keyboard": [
             [{"text": "🎫 Klaim Free Trial"}, {"text": "📈 Cek Grafik Koin"}],
-            [{"text": "💎 Upgrade VIP"}, {"text": "👤 Status Akun"}],
+            [{"text": "🌐 Tren Global"}, {"text": "💎 Upgrade VIP"}],
+            [{"text": "👤 Status Akun"}],
         ],
         "resize_keyboard": True,
         "is_persistent": True
@@ -49,6 +50,8 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
         cmd = "/trial"
     elif text == "📈 Cek Grafik Koin":
         cmd = "/helpchart"
+    elif text == "🌐 Tren Global":
+        cmd = "/trending"
     elif text == "💎 Upgrade VIP":
         cmd = "/premium"
     elif text == "👤 Status Akun":
@@ -111,6 +114,30 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             notifier.send_photo(chat_id, chart_url, caption=f"📊 Grafik 24 Jam: *{coin_id.upper()}*", parse_mode="Markdown", reply_markup=keyboard)
         else:
             notifier.send_message(chat_id, f"❌ Gagal mendapatkan data untuk koin {coin_id.upper()}. Pastikan nama koin valid (contoh: btc, sol, ethereum).", reply_markup=keyboard)
+
+    elif cmd == "/trending":
+        if not storage.is_premium(chat_id):
+            notifier.send_message(chat_id, "⚠️ Fitur Tren Global (Pendeteksi Smart Money On-Chain) hanya untuk Member VIP atau Trial. Klik [Klaim Free Trial] untuk mencoba!", reply_markup=keyboard)
+            return
+            
+        notifier.send_message(chat_id, "⏳ Sedang memindai radar global...", reply_markup=keyboard)
+        try:
+            resp = requests.get("https://api.coingecko.com/api/v3/search/trending", timeout=15)
+            data = resp.json()
+            coins = data.get("coins", [])[:5]
+            
+            lines = []
+            for idx, c in enumerate(coins):
+                item = c["item"]
+                lines.append(f"{idx+1}. *{item['symbol'].upper()}* ({item['name']})")
+                
+            msg = "🌐 *TRENDING GLOBAL MINGGU INI* 🌐\n\nIni adalah 5 koin yang paling banyak diakumulasi dan dicari oleh Smart Money di seluruh dunia saat ini:\n\n"
+            msg += "\n".join(lines)
+            msg += "\n\n_Gunakan perintah /chart <koin> untuk melihat grafiknya!_"
+            msg = msg.replace('\n', '\n')
+            notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
+        except Exception as e:
+            notifier.send_message(chat_id, "❌ Gagal memindai radar global saat ini.", reply_markup=keyboard)
 
     elif cmd == "/premium":
         msg = (
