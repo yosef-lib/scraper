@@ -60,23 +60,23 @@ def run_morning_briefing():
         fg_emoji = "❓"
     elif fear_val >= 75:
         fg_emoji = "🤑"
-        fg_text = f"{fear_val} — *Extreme Greed*"
+        fg_text = str(fear_val) + " — Extreme Greed (Sangat Serakah)"
         tips = "⚠️ Pasar sangat serakah. Waspada koreksi. Pertimbangkan ambil profit sebagian!"
     elif fear_val >= 55:
         fg_emoji = "😏"
-        fg_text = f"{fear_val} — *Greed*"
+        fg_text = str(fear_val) + " — Greed (Serakah)"
         tips = "✅ Momentum bagus. Smart Money sedang aktif. Pantau sinyal lonjakan volume!"
     elif fear_val >= 45:
         fg_emoji = "😐"
-        fg_text = f"{fear_val} — *Neutral*"
+        fg_text = str(fear_val) + " — Neutral"
         tips = "🔍 Pasar sedang konsolidasi. Tunggu konfirmasi breakout sebelum entry."
     elif fear_val >= 25:
         fg_emoji = "😨"
-        fg_text = f"{fear_val} — *Fear*"
+        fg_text = str(fear_val) + " — Fear (Takut)"
         tips = "💡 Pasar takut = Peluang. Kumpulkan koin bagus saat orang panik!"
     else:
         fg_emoji = "😱"
-        fg_text = f"{fear_val} — *Extreme Fear*"
+        fg_text = str(fear_val) + " — Extreme Fear (Sangat Takut)"
         tips = "🛒 *Extreme Fear* seringkali adalah sinyal BUY terbaik! Serok pelan-pelan."
 
     gainers_text = ""
