@@ -117,8 +117,7 @@ def run_once() -> int:
     if alerts:
         subs = storage.all_subscribers(premium_only=True)
         for s in alerts:
-            alert_text = f"🚨 *VIP SIGNAL ALERT*\\n\\n{s.format_line()}"
-            alert_text = alert_text.replace('\\n', '\n')
+            alert_text = s.format_copy_trade()
             # Fetch chart
             chart_data = sources.fetch_market_chart(s.coin, days=1)
             if chart_data:

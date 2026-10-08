@@ -12,6 +12,7 @@ import notifier
 import sources
 import storage
 from main import generate_chart_url
+import dex_screener
 
 log = logging.getLogger("bot")
 
@@ -20,7 +21,8 @@ def get_main_keyboard():
     return {
         "keyboard": [
             [{"text": "🎫 Klaim Free Trial"}, {"text": "📈 Cek Grafik Koin"}],
-            [{"text": "🌐 Tren Global"}, {"text": "💎 Upgrade VIP"}],
+            [{"text": "🌐 Tren Global"}, {"text": "🐕 Radar Meme Coin"}],
+            [{"text": "🤝 Link Referral"}, {"text": "💎 Upgrade VIP"}],
             [{"text": "👤 Status Akun"}],
         ],
         "resize_keyboard": True,
@@ -52,6 +54,10 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
         cmd = "/helpchart"
     elif text == "🌐 Tren Global":
         cmd = "/trending"
+    elif text == "🐕 Radar Meme Coin":
+        cmd = "/meme"
+    elif text == "🤝 Link Referral":
+        cmd = "/referral"
     elif text == "💎 Upgrade VIP":
         cmd = "/premium"
     elif text == "👤 Status Akun":
@@ -60,9 +66,24 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     keyboard = get_main_keyboard()
 
     if cmd == "/start":
+        # Cek referral dari link (format: /start REF_chatid)
+        if len(parts) >= 2 and parts[1].startswith("REF"):
+            referrer_id = parts[1].replace("REF", "")
+            if referrer_id != chat_id:
+                if storage.record_referral(referrer_id, chat_id):
+                    # Kasih bonus +7 hari VIP ke referrer
+                    row = storage.get_subscriber(referrer_id)
+                    if row:
+                        storage.activate_premium(referrer_id, 7)
+                        notifier.send_message(referrer_id, f"🎉 *BONUS REFERRAL!* Teman Anda baru saja bergabung. Anda mendapat *+7 Hari VIP GRATIS!*", parse_mode="Markdown")
         msg = (
             "🚀 *Selamat datang di Whale Crypto VIP!*\n\n"
-            "Gunakan tombol menu di bagian bawah layar untuk mulai menggunakan fitur bot."
+            "Bot AI sinyal kripto terlengkap di Indonesia:\n"
+            "✅ Sinyal Entry + TP + SL Otomatis\n"
+            "✅ Radar Smart Money 20 Koin Top\n"
+            "✅ Radar Meme Coin DEX (Solana & ETH)\n"
+            "✅ Morning Briefing + Fear & Greed Index\n\n"
+            "Gunakan tombol menu di bagian bawah layar untuk mulai! 👇"
         )
         notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
@@ -114,6 +135,40 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
             notifier.send_photo(chat_id, chart_url, caption=f"📊 Grafik 24 Jam: *{coin_id.upper()}*", parse_mode="Markdown", reply_markup=keyboard)
         else:
             notifier.send_message(chat_id, f"❌ Gagal mendapatkan data untuk koin {coin_id.upper()}. Pastikan nama koin valid (contoh: btc, sol, ethereum).", reply_markup=keyboard)
+
+    elif cmd == "/meme":
+        if not storage.is_premium(chat_id):
+            notifier.send_message(chat_id, "⚠️ Radar Meme Coin hanya untuk Member VIP/Trial. Klik [Klaim Free Trial] untuk mencoba gratis!", reply_markup=keyboard)
+            return
+        notifier.send_message(chat_id, "⏳ Memindai DEX radar untuk meme coin Solana & ETH...", reply_markup=keyboard)
+        dex_screener.run_dex_radar(broadcast=False)
+        # Kirim langsung ke user
+        sol_pairs = dex_screener.get_trending_pairs("solana")
+        eth_pairs = dex_screener.get_trending_pairs("ethereum")
+        all_pairs = sol_pairs[:3] + eth_pairs[:2]
+        if not all_pairs:
+            notifier.send_message(chat_id, "❌ Tidak ada meme coin yang menarik saat ini. Coba lagi nanti!", reply_markup=keyboard)
+            return
+        for pair in all_pairs:
+            msg = dex_screener.format_dex_alert(pair)
+            notifier.send_message(chat_id, msg, parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif cmd == "/referral":
+        count = storage.get_referral_count(chat_id)
+        ref_link = f"https://t.me/WhaleCryptoVIP_bot?start=REF{chat_id}"
+        bonus_days = count * 7
+        msg = (
+            f"🤝 *PROGRAM REFERRAL VIP*\n\n"
+            f"Ajak teman Anda bergabung dan dapatkan:\n"
+            f"✅ *+7 Hari VIP GRATIS* untuk setiap 1 teman yang join!\n\n"
+            f"📊 Statistik Anda:\n"
+            f"👥 Total Teman Diajak: *{count} orang*\n"
+            f"🎁 Total Bonus: *+{bonus_days} Hari VIP*\n\n"
+            f"🔗 *Link Referral Unik Anda:*\n"
+            f"{ref_link}\n\n"
+            f"_Bagikan link ini ke teman, grup WA, atau postingan Threads Anda!_"
+        )
+        notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
     elif cmd == "/trending":
         if not storage.is_premium(chat_id):

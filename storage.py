@@ -60,12 +60,28 @@ def init_db() -> None:
                 created_at TEXT NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS referrals (
+                referrer_chat_id TEXT NOT NULL,
+                referred_chat_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                PRIMARY KEY (referrer_chat_id, referred_chat_id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_price_coin_time
                 ON price_history (coin, recorded_at);
             """
         )
         try:
             conn.execute("ALTER TABLE subscribers ADD COLUMN has_trial INTEGER DEFAULT 0")
+        except Exception:
+            pass
+        try:
+            conn.execute("""CREATE TABLE IF NOT EXISTS referrals (
+                referrer_chat_id TEXT NOT NULL,
+                referred_chat_id TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                PRIMARY KEY (referrer_chat_id, referred_chat_id)
+            )""")
         except Exception:
             pass
 
@@ -199,3 +215,19 @@ def claim_trial(chat_id: str) -> tuple[bool, str]:
     with get_conn() as conn:
         conn.execute("UPDATE subscribers SET has_trial = 1 WHERE chat_id = ?", (str(chat_id),))
     return True, until
+
+def get_referral_count(chat_id: str) -> int:
+    with get_conn() as conn:
+        cur = conn.execute("SELECT COUNT(*) FROM referrals WHERE referrer_chat_id = ?", (str(chat_id),))
+        return cur.fetchone()[0]
+
+def record_referral(referrer_id: str, referred_id: str) -> bool:
+    try:
+        with get_conn() as conn:
+            conn.execute(
+                "INSERT OR IGNORE INTO referrals (referrer_chat_id, referred_chat_id, created_at) VALUES (?, ?, ?)",
+                (str(referrer_id), str(referred_id), __import__("datetime").datetime.utcnow().isoformat())
+            )
+        return True
+    except Exception:
+        return False
