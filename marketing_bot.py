@@ -112,37 +112,91 @@ def get_market_data():
     coins = ["Bitcoin", "Ethereum", "Solana", "Dogecoin", "Pepe"]
     return random.choice(coins), random.uniform(3.0, 15.0)
 
+
 # --- Mesin Auto-Pilot ---
 def auto_post_marketing(time_key="13:00"):
+    import storage
     coin_name, gain = get_market_data()
     
     photo_url = f"https://www.coingecko.com/chart/images/{coin_name.lower()}/large.png"
     
-    if time_key == "08:00":
+    mode = random.choice(["TEASER", "FLASHDROP", "PROMO"])
+    
+    # Override khusus jam tertentu biar merata
+    if time_key == "08:00": mode = "TEASER"
+    elif time_key == "13:00": mode = random.choice(["FLASHDROP", "PROMO"])
+    
+    if mode == "FLASHDROP":
+        # UANG KAGET VOUCHER!
+        code = storage.create_voucher(3) # 3 Hari VIP Gratis
         caption = (
-            f"🌅 *MORNING RADAR UPDATE!*\n\n"
-            f"AI mendeteksi lonjakan pada *{coin_name}* (+{gain:.1f}%).\n\n"
-            f"Member VIP sudah mengambil posisi sejak subuh dan meraup cuan otomatis.\n"
-            f"Ingin tahu target profit selanjutnya? Jangan trading buta pakai firasat!\n\n"
-            f"👇 Klaim Akses VIP GRATIS 24 Jam di bawah ini!"
+            f"🎁 *UANG KAGET VOUCHER REBUTAN!* 🎁
+
+"
+            f"Rezeki dari langit siang ini! Siapa cepat dia dapat!
+"
+            f"Voucher Akses VIP 3 HARI GRATIS hanya bisa diklaim oleh *1 ORANG PERTAMA* yang klik tombol di bawah ini.
+
+"
+            f"Siap? 3.. 2.. 1.. SIKAT!"
         )
-    elif time_key == "13:00":
+        inline_kb = {
+            "inline_keyboard": [
+                [{"text": "🎁 KLAIM VOUCHER VIP KAGET SEKARANG!", "url": f"https://t.me/scraping26bot?start=VOUCHER_{code}"}]
+            ]
+        }
+        data = {
+            "chat_id": CHANNEL_ID,
+            "photo": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+            "caption": caption,
+            "parse_mode": "Markdown",
+            "reply_markup": json.dumps(inline_kb)
+        }
+        requests.post(f"{API_URL}/sendPhoto", data=data, timeout=15)
+        return True
+
+    elif mode == "TEASER":
+        # SINYAL SENSOR
         caption = (
-            f"⚡ *MARKET FLASH UPDATE!*\n\n"
-            f"Siang ini *{coin_name}* memimpin dengan kenaikan tajam +{gain:.1f}%!\n\n"
-            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi.\n\n"
-            f"👇 Cobain botnya GRATIS 24 jam!"
+            f"🚨 *SINYAL AI BOCOR!* 🚨
+
+"
+            f"Koin: *{coin_name}*
+"
+            f"Trend: *BULLISH / MOMENTUM KUAT*
+
+"
+            f"Target Profit (TP1): 🛑 _[SENSORD - KHUSUS VIP]_
+"
+            f"Target Profit (TP2): 🛑 _[SENSORD - KHUSUS VIP]_
+"
+            f"Stop Loss (SL): 🛑 _[SENSORD - KHUSUS VIP]_
+
+"
+            f"Koin ini diprediksi bersiap *terbang +{gain:.1f}%* hari ini! Member VIP sudah masuk posisi dan pasang jaring profit otomatis.
+"
+            f"Masih mau jadi penonton orang lain cuan?
+
+"
+            f"👇 Buka Target Koinnya Sekarang:"
         )
-    else: # 19:00 or custom
+        return send_photo_to_free(photo_url, caption)
+
+    else:
+        # PROMO NORMAL
         caption = (
-            f"🌙 *NIGHT RECAP*\n\n"
-            f"Hari ini pergerakan *{coin_name}* sukses mencetak profit +{gain:.1f}%!\n\n"
-            f"Sinyal AI kami tidak pernah tidur. Siap untuk profit besok pagi?\n\n"
-            f"👇 Gabung ke VIP sekarang (Bisa Free Trial 24 Jam)!"
+            f"⚡ *MARKET FLASH UPDATE!*
+
+"
+            f"Saat ini *{coin_name}* memimpin dengan potensi anomali volume +{gain:.1f}%!
+
+"
+            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi tanpa campur tangan emosi.
+
+"
+            f"👇 Cobain botnya GRATIS 24 jam atau langsung upgrade!"
         )
-        
-    log.info(f"Auto-posting to {CHANNEL_ID} for time {time_key}")
-    return send_photo_to_free(photo_url, caption)
+        return send_photo_to_free(photo_url, caption)
 
 def reminder_loop():
     global _posted_today

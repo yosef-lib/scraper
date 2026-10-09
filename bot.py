@@ -65,6 +65,17 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
 
     keyboard = get_main_keyboard()
 
+
+    if cmd == "/start":
+        if len(parts) >= 2 and parts[1].startswith("VOUCHER_"):
+            code = parts[1].replace("VOUCHER_", "")
+            ok, msg_text = storage.claim_voucher(code, chat_id)
+            if ok:
+                notifier.send_message(chat_id, f"🎉 *SELAMAT!* Anda adalah orang tercepat yang berhasil merebut Voucher Kaget! 🚀\n\nVIP Anda kini aktif sampai {msg_text[:10]}\nSilakan nikmati fasilitas VIP!", parse_mode="Markdown")
+            else:
+                notifier.send_message(chat_id, f"❌ Gagal: {msg_text}\n\n_(Yah, kemungkinan besar vouchernya sudah keduluan direbut orang lain yang jarinya lebih cepat. Pantau terus Channel Gratis ya!)_", parse_mode="Markdown")
+            return
+
     if cmd == "/start":
         # Cek referral dari link (format: /start REF_chatid)
         if len(parts) >= 2 and parts[1].startswith("REF"):
@@ -283,6 +294,18 @@ def run_polling() -> None:
                         
                         # 4. Beritahu pembeli
                         notifier.send_message(buyer_id, "🎉 *PEMBAYARAN BERHASIL!*\n\nStatus VIP Anda telah diaktifkan selama 30 Hari! Silakan ketik /status atau /sinyal untuk mulai menggunakan.", parse_mode="Markdown")
+                        # 5. [NEW] FOMO Broadcast ke Channel
+                        import random
+                        fomo_msgs = [
+                            "🎉 *BOOM!* 1 Member cerdas baru saja bergabung ke VIP dan langsung mengamankan bocoran koin AI kita!\n\n⏳ _Sisa slot harga promo hari ini cuma sisa sedikit lagi. Jangan sampai ketinggalan roket!_",
+                            "🔥 *SLOT VIP MAKIN MENIPIS!* 1 Member baru saja join VIP dan langsung ikut panen dari dalam.\n\nYang masih di luar, yakin cuma mau nonton orang lain cuan dan nunggu sisaan?\n\n⏳ _Amankan posisi Anda sekarang!_"
+                        ]
+                        requests.post(f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/sendMessage", json={
+                            "chat_id": config.TELEGRAM_CHANNEL_ID,
+                            "text": random.choice(fomo_msgs) + "\n\n👇 *Gabung via bot: @scraping26bot*",
+                            "parse_mode": "Markdown"
+                        })
+
                     continue
                 
                 # --- MESSAGE HANDLER ---
