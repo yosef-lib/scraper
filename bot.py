@@ -309,6 +309,16 @@ def run_polling() -> None:
                             notifier.send_photo(admin_id, file_id, caption=caption, parse_mode="Markdown", reply_markup=inline_kb)
                             
                         notifier.send_message(chat_id, "✅ Bukti pembayaran telah diterima.\n\nMohon tunggu verifikasi Admin 1-3 menit. VIP Anda akan otomatis aktif di chat ini tanpa memerlukan kode.")
+                    else:
+                        # Admin is testing
+                        file_id = message["photo"][-1]["file_id"]
+                        inline_kb = {
+                            "inline_keyboard": [
+                                [{"text": "✅ TERIMA & AKTIFKAN VIP (TEST)", "callback_data": f"approve_{chat_id}"}]
+                            ]
+                        }
+                        caption = f"💳 *[TESTING ADMIN]* BUKTI TRANSFER BARU\n\nJika yang mengirim foto adalah pembeli, pesannya akan tampil seperti ini di Telegram Anda, dan Anda tinggal klik tombol di bawah. Coba klik tombolnya!"
+                        notifier.send_photo(chat_id, file_id, caption=caption, parse_mode="Markdown", reply_markup=inline_kb)
                     continue
 
                 if message.get("document"):
