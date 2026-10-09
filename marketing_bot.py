@@ -226,17 +226,32 @@ def handle_command(chat_id, text):
         else:
             send_msg(chat_id, "❌ Gagal memposting. Cek log server.")
 
-    elif "Draft Threads" in text or text == "/draft_threads":
+    elif "Draft Threads" in text or text == "/draft_threads" or "Draft IG" in text:
+        import urllib.parse
         templates = [
             f"Iseng bikin Bot AI pelacak pergerakan Smart Money di kripto.\n\nPagi tadi bunyi di {coin_name} pas masih sepi, eh sekarang beneran terbang +{gain:.1f}%! Mau nyobain botnya gratis 24 jam?\n\nCek link di bio ya!\n\n#crypto #bitcoin #cuan #investasi",
+            f"Stop trading pakai firasat!\n\nAI kita nangkap sinyal {coin_name} sebelum naik. Hasilnya? Langsung terbang +{gain:.1f}% dalam beberapa jam.\n\nTes keakuratan AI kita GRATIS 24 jam, klik link di bio!\n\n#whaleradar #cryptoid #bitcoin #cuan",
+            f"Capek ikut grup VIP Crypto yang adminnya lepas tangan pas koin nyungsep? 📉\n\nTinggalkan cara lama. AI Whale Radar hitung Entry sampai Stop Loss pakai matematika, bukan firasat.\n\nHari ini terbukti di {coin_name} (+{gain:.1f}%). Coba gratis 24 jam di link bio!"
         ]
-        send_msg(chat_id, "✅ DRAFT THREADS SIAP:\n\n" + random.choice(templates))
-
-    elif "Draft IG" in text or text == "/draft_ig":
-        templates = [
-            f"🔥 {coin_name} NAIK +{gain:.1f}% HARI INI! 🔥\n\nMember VIP sudah cuan dari pagi.\nYang masih manual pasti ketinggalan!\n\nFREE TRIAL 24 Jam ada di link bio 🚀\n\n#crypto #bitcoin",
-        ]
-        send_msg(chat_id, "✅ DRAFT IG STORY SIAP:\n\n" + random.choice(templates))
+        caption = random.choice(templates)
+        
+        # Link 1-Klik Post
+        text_encoded = urllib.parse.quote(caption)
+        bot_link = urllib.parse.quote("https://t.me/scraping26bot")
+        
+        tw_url = f"https://twitter.com/intent/tweet?text={text_encoded}"
+        th_url = f"https://www.threads.net/intent/post?text={text_encoded}"
+        fb_url = f"https://www.facebook.com/sharer/sharer.php?u={bot_link}&quote={text_encoded}"
+        
+        kb = {
+            "inline_keyboard": [
+                [{"text": "🐦 1-Klik Twitter", "url": tw_url}],
+                [{"text": "🌀 1-Klik Threads", "url": th_url}],
+                [{"text": "📘 1-Klik Facebook", "url": fb_url}]
+            ]
+        }
+        
+        send_msg(chat_id, f"✅ *DRAFT KONTEN SIAP:*\n\n{caption}\n\n👇 *Klik tombol di bawah untuk langsung nge-post!*", reply_markup=kb)
 
     elif "Roast Competitor" in text or text == "/roast_competitor":
         templates = [
