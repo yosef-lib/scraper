@@ -268,7 +268,7 @@ def run_polling() -> None:
                         buyer_id = cb_data.split("_")[1]
                         
                         # 1. Aktifkan VIP
-                        storage.add_premium(buyer_id, config.PREMIUM_DURATION_DAYS)
+                        storage.activate_premium(buyer_id, config.PREMIUM_DURATION_DAYS)
                         
                         # 2. Hapus tombol dari pesan admin
                         requests.post(f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/editMessageCaption", json={
