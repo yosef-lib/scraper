@@ -196,20 +196,18 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
 
     elif cmd == "/premium":
         msg = (
-            "💎 *AKSES PREMIUM WHALE CRYPTO VIP*\n\n"
+            "💳 *AKSES PREMIUM WHALE CRYPTO VIP*\n\n"
             "Harga Promo: *Rp 50.000* / 30 Hari\n\n"
-            "───────────────────\n"
+            "======================\n"
             "💳 *METODE PEMBAYARAN:*\n\n"
             "🏦 Bank Mandiri: `1420019877454`\n"
             "👤 a.n: YOSEF PASKAH WAHYUTO\n\n"
             "*(Bebas Biaya Admin, 100% Aman)*\n"
-            "───────────────────\n\n"
-            "📩 *CARA AKTIVASI VIP:*\n"
-            "1. Lakukan transfer Rp 50.000 ke rekening Mandiri di atas.\n"
-            "2. Kirim screenshot bukti transfer ke Admin via chat.\n"
-            "3. Admin akan memberikan Kode Voucher VIP Anda.\n\n"
-            "Jika sudah menerima kode voucher, ketik di chat ini:\n"
-            "`/aktivasi PREM-XXXX`"
+            "======================\n\n"
+            "🚀 *CARA AKTIVASI VIP (OTOMATIS):*\n"
+            "1. Transfer Rp 50.000 ke rekening Mandiri di atas.\n"
+            "2. **Kirim/Upload screenshot bukti transfer langsung ke chat bot ini.**\n\n"
+            "Sistem akan langsung memverifikasi dan mengaktifkan VIP Anda tanpa perlu memasukkan kode apapun!"
         )
         notifier.send_message(chat_id, msg, parse_mode="Markdown", reply_markup=keyboard)
 
@@ -258,6 +256,36 @@ def run_polling() -> None:
             updates = _get_updates(offset)
             for upd in updates.get("result", []):
                 offset = upd["update_id"] + 1
+                
+                # --- CALLBACK QUERY HANDLER (TOMBOL APPROVE) ---
+                callback = upd.get("callback_query")
+                if callback:
+                    cb_id = callback["id"]
+                    cb_data = callback.get("data", "")
+                    admin_chat_id = str(callback["message"]["chat"]["id"])
+                    
+                    if admin_chat_id == str(config.TELEGRAM_ADMIN_CHAT_ID) and cb_data.startswith("approve_"):
+                        buyer_id = cb_data.split("_")[1]
+                        
+                        # 1. Aktifkan VIP
+                        storage.add_premium(buyer_id, config.PREMIUM_DURATION_DAYS)
+                        
+                        # 2. Hapus tombol dari pesan admin
+                        requests.post(f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/editMessageCaption", json={
+                            "chat_id": admin_chat_id,
+                            "message_id": callback["message"]["message_id"],
+                            "caption": "✅ *SUDAH DI-APPROVE & AKTIF*",
+                            "parse_mode": "Markdown"
+                        })
+                        
+                        # 3. Jawab callback
+                        requests.post(f"{config.TELEGRAM_API}/bot{config.TELEGRAM_BOT_TOKEN}/answerCallbackQuery", json={"callback_query_id": cb_id, "text": "VIP Berhasil Diaktifkan!"})
+                        
+                        # 4. Beritahu pembeli
+                        notifier.send_message(buyer_id, "🎉 *PEMBAYARAN BERHASIL!*\n\nStatus VIP Anda telah diaktifkan selama 30 Hari! Silakan ketik /status atau /sinyal untuk mulai menggunakan.", parse_mode="Markdown")
+                    continue
+                
+                # --- MESSAGE HANDLER ---
                 message = upd.get("message") or upd.get("edited_message")
                 if not message:
                     continue
@@ -265,14 +293,32 @@ def run_polling() -> None:
                 chat_id = str(chat.get("id"))
                 username = chat.get("username", "Unknown")
                 
-                if message.get("photo") or message.get("document"):
+                if message.get("photo"):
                     if str(chat_id) != str(config.TELEGRAM_ADMIN_CHAT_ID):
-                        msg_id = message.get("message_id")
                         admin_id = config.TELEGRAM_ADMIN_CHAT_ID
                         if admin_id:
-                            notifier.send_message(admin_id, f"💳 *BUKTI TRANSFER BARU*\nDari: @{username}\nID: `{chat_id}`\n\nSilakan cek foto di bawah ini. Jika valid, buat voucher dengan:\n`/generate_voucher`\nLalu kirimkan kodenya langsung ke user tersebut (Anda bisa klik ID-nya atau cari username-nya).", parse_mode="Markdown")
+                            file_id = message["photo"][-1]["file_id"]
+                            
+                            inline_kb = {
+                                "inline_keyboard": [
+                                    [{"text": "✅ TERIMA & AKTIFKAN VIP", "callback_data": f"approve_{chat_id}"}]
+                                ]
+                            }
+                            
+                            caption = f"💳 *BUKTI TRANSFER BARU*\nDari: @{username}\nID: `{chat_id}`\n\nKlik tombol di bawah untuk langsung mengaktifkan VIP pembeli ini. Tidak perlu bikin kode voucher lagi!"
+                            notifier.send_photo(admin_id, file_id, caption=caption, parse_mode="Markdown", reply_markup=inline_kb)
+                            
+                        notifier.send_message(chat_id, "✅ Bukti pembayaran telah diterima.\n\nMohon tunggu verifikasi Admin 1-3 menit. VIP Anda akan otomatis aktif di chat ini tanpa memerlukan kode.")
+                    continue
+
+                if message.get("document"):
+                    if str(chat_id) != str(config.TELEGRAM_ADMIN_CHAT_ID):
+                        admin_id = config.TELEGRAM_ADMIN_CHAT_ID
+                        if admin_id:
+                            msg_id = message.get("message_id")
+                            notifier.send_message(admin_id, f"💳 *BUKTI TRANSFER DOKUMEN*\nDari: @{username}\nID: `{chat_id}`\n\nUser mengirim dokumen bukan gambar. Anda bisa menggunakan /generate_voucher lalu berikan ke user.", parse_mode="Markdown")
                             notifier.forward_message(admin_id, chat_id, msg_id)
-                        notifier.send_message(chat_id, "✅ Bukti pembayaran Anda telah diteruskan ke Admin.\n\nMohon tunggu verifikasi. Kode Voucher akan segera dikirimkan ke Anda setelah dicek.")
+                        notifier.send_message(chat_id, "✅ Dokumen diterima. Tunggu admin memverifikasi.")
                     continue
 
                 text = message.get("text", "")

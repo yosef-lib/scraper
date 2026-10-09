@@ -26,7 +26,7 @@ def send_message(chat_id: str, text: str, parse_mode: str | None = None, reply_m
         log.error("Error jaringan saat kirim pesan: %s", exc)
         return False
 
-def send_photo(chat_id: str, photo: str, caption: str = "", parse_mode: str | None = None) -> bool:
+def send_photo(chat_id: str, photo: str, caption: str = "", parse_mode: str | None = None, reply_markup: dict | None = None) -> bool:
     if not config.TELEGRAM_BOT_TOKEN:
         log.error("TELEGRAM_BOT_TOKEN belum diisi, foto tidak dikirim.")
         return False
@@ -34,6 +34,8 @@ def send_photo(chat_id: str, photo: str, caption: str = "", parse_mode: str | No
     payload = {"chat_id": chat_id, "photo": photo, "caption": caption}
     if parse_mode:
         payload["parse_mode"] = parse_mode
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
         
     try:
         resp = requests.post(url, json=payload, timeout=30)
