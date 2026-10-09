@@ -120,43 +120,24 @@ def auto_post_marketing(time_key="13:00"):
     
     if time_key == "08:00":
         caption = (
-            f"🌅 *MORNING RADAR UPDATE!*
-
-"
-            f"AI mendeteksi lonjakan pada *{coin_name}* (+{gain:.1f}%).
-
-"
-            f"Member VIP sudah mengambil posisi sejak subuh dan meraup cuan otomatis.
-"
-            f"Ingin tahu target profit selanjutnya? Jangan trading buta pakai firasat!
-
-"
+            f"🌅 *MORNING RADAR UPDATE!*\n\n"
+            f"AI mendeteksi lonjakan pada *{coin_name}* (+{gain:.1f}%).\n\n"
+            f"Member VIP sudah mengambil posisi sejak subuh dan meraup cuan otomatis.\n"
+            f"Ingin tahu target profit selanjutnya? Jangan trading buta pakai firasat!\n\n"
             f"👇 Klaim Akses VIP GRATIS 24 Jam di bawah ini!"
         )
     elif time_key == "13:00":
         caption = (
-            f"⚡ *MARKET FLASH UPDATE!*
-
-"
-            f"Siang ini *{coin_name}* memimpin dengan kenaikan tajam +{gain:.1f}%!
-
-"
-            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi.
-
-"
+            f"⚡ *MARKET FLASH UPDATE!*\n\n"
+            f"Siang ini *{coin_name}* memimpin dengan kenaikan tajam +{gain:.1f}%!\n\n"
+            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi.\n\n"
             f"👇 Cobain botnya GRATIS 24 jam!"
         )
     else: # 19:00 or custom
         caption = (
-            f"🌙 *NIGHT RECAP*
-
-"
-            f"Hari ini pergerakan *{coin_name}* sukses mencetak profit +{gain:.1f}%!
-
-"
-            f"Sinyal AI kami tidak pernah tidur. Siap untuk profit besok pagi?
-
-"
+            f"🌙 *NIGHT RECAP*\n\n"
+            f"Hari ini pergerakan *{coin_name}* sukses mencetak profit +{gain:.1f}%!\n\n"
+            f"Sinyal AI kami tidak pernah tidur. Siap untuk profit besok pagi?\n\n"
             f"👇 Gabung ke VIP sekarang (Bisa Free Trial 24 Jam)!"
         )
         
@@ -199,11 +180,8 @@ def handle_command(chat_id, text):
 
     if text in ["/start", "🔙 Kembali ke Menu Utama"]:
         send_msg(chat_id,
-            "🎯 *WHALE MARKETING CENTER*
-
-"
-            "Sistem Auto-Pilot aktif! Promo akan dikirim jam 08:00, 13:00, dan 19:00.
-"
+            "🎯 *WHALE MARKETING CENTER*\n\n"
+            "Sistem Auto-Pilot aktif! Promo akan dikirim jam 08:00, 13:00, dan 19:00.\n"
             "Pilih opsi di bawah untuk posting manual:",
             main_keyboard
         )
@@ -220,61 +198,38 @@ def handle_command(chat_id, text):
         templates = [
             f"Iseng bikin Bot AI pelacak pergerakan Smart Money di kripto.\n\nPagi tadi bunyi di {coin_name} pas masih sepi, eh sekarang beneran terbang +{gain:.1f}%! Mau nyobain botnya gratis 24 jam?\n\nCek link di bio ya!\n\n#crypto #bitcoin #cuan #investasi",
         ]
-        send_msg(chat_id, "✅ DRAFT THREADS SIAP:
-
-" + random.choice(templates))
+        send_msg(chat_id, "✅ DRAFT THREADS SIAP:\n\n" + random.choice(templates))
 
     elif "Draft IG" in text or text == "/draft_ig":
         templates = [
             f"🔥 {coin_name} NAIK +{gain:.1f}% HARI INI! 🔥\n\nMember VIP sudah cuan dari pagi.\nYang masih manual pasti ketinggalan!\n\nFREE TRIAL 24 Jam ada di link bio 🚀\n\n#crypto #bitcoin",
         ]
-        send_msg(chat_id, "✅ DRAFT IG STORY SIAP:
-
-" + random.choice(templates))
+        send_msg(chat_id, "✅ DRAFT IG STORY SIAP:\n\n" + random.choice(templates))
 
     elif "Roast Competitor" in text or text == "/roast_competitor":
         templates = [
             f"Capek ikut grup VIP Crypto yang adminnya lepas tangan pas koin nyungsep? 📉\n\nTinggalkan cara lama. AI Whale Radar hitung Entry sampai Stop Loss pakai matematika, bukan firasat.\n\nHari ini terbukti di {coin_name} (+{gain:.1f}%). Coba gratis 24 jam di link bio!",
         ]
-        send_msg(chat_id, "✅ TEKS ROAST SIAP:
-
-" + random.choice(templates))
+        send_msg(chat_id, "✅ TEKS ROAST SIAP:\n\n" + random.choice(templates))
 
     elif "Broadcast ke Channel" in text:
         send_msg(chat_id,
-            "📢 PILIH TEMPLATE BROADCAST MANUAL:
-Atau ketik pesan custom dengan `/bom_free <pesan>`",
+            "📢 PILIH TEMPLATE BROADCAST MANUAL:\nAtau ketik pesan custom dengan `/bom_free <pesan>`",
             broadcast_keyboard
         )
 
     elif "Broadcast: Update Sinyal" in text:
-        pesan = f"📊 MARKET UPDATE — {coin_name}
-
-Koin {coin_name} menunjukkan pergerakan signifikan hari ini (+{gain:.1f}%).
-
-Ingin sinyal lengkap dengan Entry, TP & Stop Loss?
-👉 Klaim FREE TRIAL 24 Jam: @scraping26bot"
+        pesan = f"📊 MARKET UPDATE — {coin_name}\n\nKoin {coin_name} menunjukkan pergerakan signifikan hari ini (+{gain:.1f}%).\n\nIngin sinyal lengkap dengan Entry, TP & Stop Loss?\n👉 Klaim FREE TRIAL 24 Jam: @scraping26bot"
         ok = broadcast_to_free(pesan)
         send_msg(chat_id, "✅ Broadcast berhasil!" if ok else "❌ Gagal broadcast.")
 
     elif "Broadcast: Promo Free Trial" in text:
-        pesan = "🎁 PROMO TERBATAS!
-
-Dapatkan akses GRATIS ke Bot AI Whale Crypto selama 24 Jam!
-
-Pantau sinyal Smart Money + Entry + Target Profit otomatis.
-
-👉 Klik [Klaim Free Trial] di @scraping26bot"
+        pesan = "🎁 PROMO TERBATAS!\n\nDapatkan akses GRATIS ke Bot AI Whale Crypto selama 24 Jam!\n\nPantau sinyal Smart Money + Entry + Target Profit otomatis.\n\n👉 Klik [Klaim Free Trial] di @scraping26bot"
         ok = broadcast_to_free(pesan)
         send_msg(chat_id, "✅ Broadcast berhasil!" if ok else "❌ Gagal broadcast.")
 
     elif "Broadcast: Koin Sedang Terbang" in text:
-        pesan = f"🔥 SMART MONEY TERDETEKSI!
-
-Radar AI mendeteksi lonjakan volume anomali pada {coin_name} (+{gain:.1f}%).
-
-Mau ikut next signal?
-👉 Coba GRATIS 24 Jam di @scraping26bot"
+        pesan = f"🔥 SMART MONEY TERDETEKSI!\n\nRadar AI mendeteksi lonjakan volume anomali pada {coin_name} (+{gain:.1f}%).\n\nMau ikut next signal?\n👉 Coba GRATIS 24 Jam di @scraping26bot"
         ok = broadcast_to_free(pesan)
         send_msg(chat_id, "✅ Broadcast berhasil!" if ok else "❌ Gagal broadcast.")
 
