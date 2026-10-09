@@ -228,7 +228,7 @@ def handle_command(chat_id: str, username: str | None, text: str) -> None:
     elif cmd == "/status":
         if storage.is_premium(chat_id):
             row = storage.get_subscriber(chat_id)
-            notifier.send_message(chat_id, f"👤 *Status: PREMIUM/TRIAL*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown", reply_markup=keyboard)
+            notifier.send_message(chat_id, f"👤 *Status: PREMIUM*\nBerlaku sampai {row['premium_until'][:10]}.", parse_mode="Markdown", reply_markup=keyboard)
         else:
             notifier.send_message(chat_id, "Anda pengguna FREE. Klik tombol [Klaim Free Trial] untuk mencoba fitur VIP.", reply_markup=keyboard)
 
