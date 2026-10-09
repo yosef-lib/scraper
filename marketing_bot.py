@@ -113,6 +113,7 @@ def get_market_data():
     return random.choice(coins), random.uniform(3.0, 15.0)
 
 
+
 # --- Mesin Auto-Pilot ---
 def auto_post_marketing(time_key="13:00"):
     import storage
@@ -130,14 +131,9 @@ def auto_post_marketing(time_key="13:00"):
         # UANG KAGET VOUCHER!
         code = storage.create_voucher(3) # 3 Hari VIP Gratis
         caption = (
-            f"🎁 *UANG KAGET VOUCHER REBUTAN!* 🎁
-
-"
-            f"Rezeki dari langit siang ini! Siapa cepat dia dapat!
-"
-            f"Voucher Akses VIP 3 HARI GRATIS hanya bisa diklaim oleh *1 ORANG PERTAMA* yang klik tombol di bawah ini.
-
-"
+            f"🎁 *UANG KAGET VOUCHER REBUTAN!* 🎁\n\n"
+            f"Rezeki dari langit siang ini! Siapa cepat dia dapat!\n"
+            f"Voucher Akses VIP 3 HARI GRATIS hanya bisa diklaim oleh *1 ORANG PERTAMA* yang klik tombol di bawah ini.\n\n"
             f"Siap? 3.. 2.. 1.. SIKAT!"
         )
         inline_kb = {
@@ -158,26 +154,14 @@ def auto_post_marketing(time_key="13:00"):
     elif mode == "TEASER":
         # SINYAL SENSOR
         caption = (
-            f"🚨 *SINYAL AI BOCOR!* 🚨
-
-"
-            f"Koin: *{coin_name}*
-"
-            f"Trend: *BULLISH / MOMENTUM KUAT*
-
-"
-            f"Target Profit (TP1): 🛑 _[SENSORD - KHUSUS VIP]_
-"
-            f"Target Profit (TP2): 🛑 _[SENSORD - KHUSUS VIP]_
-"
-            f"Stop Loss (SL): 🛑 _[SENSORD - KHUSUS VIP]_
-
-"
-            f"Koin ini diprediksi bersiap *terbang +{gain:.1f}%* hari ini! Member VIP sudah masuk posisi dan pasang jaring profit otomatis.
-"
-            f"Masih mau jadi penonton orang lain cuan?
-
-"
+            f"🚨 *SINYAL AI BOCOR!* 🚨\n\n"
+            f"Koin: *{coin_name}*\n"
+            f"Trend: *BULLISH / MOMENTUM KUAT*\n\n"
+            f"Target Profit (TP1): 🛑 _[SENSORD - KHUSUS VIP]_\n"
+            f"Target Profit (TP2): 🛑 _[SENSORD - KHUSUS VIP]_\n"
+            f"Stop Loss (SL): 🛑 _[SENSORD - KHUSUS VIP]_\n\n"
+            f"Koin ini diprediksi bersiap *terbang +{gain:.1f}%* hari ini! Member VIP sudah masuk posisi dan pasang jaring profit otomatis.\n"
+            f"Masih mau jadi penonton orang lain cuan?\n\n"
             f"👇 Buka Target Koinnya Sekarang:"
         )
         return send_photo_to_free(photo_url, caption)
@@ -185,15 +169,9 @@ def auto_post_marketing(time_key="13:00"):
     else:
         # PROMO NORMAL
         caption = (
-            f"⚡ *MARKET FLASH UPDATE!*
-
-"
-            f"Saat ini *{coin_name}* memimpin dengan potensi anomali volume +{gain:.1f}%!
-
-"
-            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi tanpa campur tangan emosi.
-
-"
+            f"⚡ *MARKET FLASH UPDATE*\n\n"
+            f"Saat ini *{coin_name}* memimpin dengan potensi anomali volume +{gain:.1f}%!\n\n"
+            f"Jangan cuma jadi penonton. Biarkan AI Whale Radar memandu *entry* dan *exit* Anda secara presisi tanpa campur tangan emosi.\n\n"
             f"👇 Cobain botnya GRATIS 24 jam atau langsung upgrade!"
         )
         return send_photo_to_free(photo_url, caption)
