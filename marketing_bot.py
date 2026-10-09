@@ -58,7 +58,7 @@ def send_photo_to_free(photo_url, caption):
     inline_kb = {
         "inline_keyboard": [
             [{"text": "🚀 KLAIM VIP GRATIS 24 JAM", "url": "https://t.me/scraping26bot?start=freetrial"}],
-            [{"text": "💎 UPGRADE VIP (Rp 25.000/Bulan)", "url": "https://t.me/scraping26bot?start=premium"}]
+            [{"text": "💎 UPGRADE VIP (Rp 50.000/Bulan)", "url": "https://t.me/scraping26bot?start=premium"}]
         ]
     }
     data = {
