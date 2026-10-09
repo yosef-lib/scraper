@@ -229,9 +229,25 @@ def handle_command(chat_id, text):
     elif "Draft Threads" in text or text == "/draft_threads" or "Draft IG" in text:
         import urllib.parse
         templates = [
-            f"Iseng bikin Bot AI pelacak pergerakan Smart Money di kripto.\n\nPagi tadi bunyi di {coin_name} pas masih sepi, eh sekarang beneran terbang +{gain:.1f}%! Mau nyobain botnya gratis 24 jam?\n\nCek link di bio ya!\n\n#crypto #bitcoin #cuan #investasi",
-            f"Stop trading pakai firasat!\n\nAI kita nangkap sinyal {coin_name} sebelum naik. Hasilnya? Langsung terbang +{gain:.1f}% dalam beberapa jam.\n\nTes keakuratan AI kita GRATIS 24 jam, klik link di bio!\n\n#whaleradar #cryptoid #bitcoin #cuan",
-            f"Capek ikut grup VIP Crypto yang adminnya lepas tangan pas koin nyungsep? 📉\n\nTinggalkan cara lama. AI Whale Radar hitung Entry sampai Stop Loss pakai matematika, bukan firasat.\n\nHari ini terbukti di {coin_name} (+{gain:.1f}%). Coba gratis 24 jam di link bio!"
+            f"""Iseng bikin Bot AI pelacak pergerakan Smart Money di kripto.
+
+Pagi tadi bunyi di {coin_name} pas masih sepi, eh sekarang beneran terbang +{gain:.1f}%! Mau nyobain botnya gratis 24 jam?
+
+Cek link di bio ya!
+
+#crypto #bitcoin #cuan #investasi""",
+            f"""Stop trading pakai firasat!
+
+AI kita nangkap sinyal {coin_name} sebelum naik. Hasilnya? Langsung terbang +{gain:.1f}% dalam beberapa jam.
+
+Tes keakuratan AI kita GRATIS 24 jam, klik link di bio!
+
+#whaleradar #cryptoid #bitcoin #cuan""",
+            f"""Capek ikut grup VIP Crypto yang adminnya lepas tangan pas koin nyungsep? 📉
+
+Tinggalkan cara lama. AI Whale Radar hitung Entry sampai Stop Loss pakai matematika, bukan firasat.
+
+Hari ini terbukti di {coin_name} (+{gain:.1f}%). Coba gratis 24 jam di link bio!"""
         ]
         caption = random.choice(templates)
         
