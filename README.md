@@ -1,89 +1,115 @@
-# VPS Mesin Uang — Sinyal Harga Kripto Berlangganan
+# 🚀 DexScreener Whale Radar, Token Auditor & Telegram Signal Engine
 
-Sistem otomatis di VPS yang: mengambil harga kripto → menghitung sinyal →
-mengirim ringkasan ke admin dan alert ke pelanggan premium → melayani
-langganan via bot Telegram.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
+[![DexScreener](https://img.shields.io/badge/DexScreener-API_v1-00E599)](https://dexscreener.com)
+[![RugCheck](https://img.shields.io/badge/RugCheck-Security_Audit-8A2BE2)](https://rugcheck.xyz)
+[![Telegram](https://img.shields.io/badge/Telegram_Bot-TeleBot-2CA5E0?logo=telegram&logoColor=white)](https://t.me/scraping26bot)
+[![License](https://img.shields.io/badge/License-Dual_MIT%20%2F%20Commercial-brightgreen)](LICENSE)
 
-## ⚠️ Keamanan (WAJIB duluan)
-Token Telegram lama di `scraper.py` sudah bocor (pernah ditulis di kode).
-1. Buka @BotFather → `/revoke` → pilih bot → dapatkan token **baru**.
-2. Simpan token baru HANYA di file `.env` (jangan pernah di kode/git).
-3. File `scraper.py` lama sudah dinonaktifkan dan tidak dipakai lagi.
+An autonomous, multi-threaded Web3 intelligence system that monitors real-time DEX liquidity pools across Solana, Ethereum, Base, and TON. It detects volume breakout anomalies, runs automated RugCheck security audits, calculates volatility take-profit & stop-loss targets, and broadcasts zero-delay signals with an automated CryptoBot payment gateway.
 
-## Struktur
+---
+
+## ⚡ Live Demos & Production Showcase
+
+* 📢 **Live Public Signal Channel:** [@WhaleCryptoFree](https://t.me/WhaleCryptoFree) *(Automated 15-min alerts)*
+* 🤖 **Interactive Telegram Bot:** [@scraping26bot](https://t.me/scraping26bot) *(Live token scanner & auditor)*
+* 📰 **On-Chain Intelligence Briefs:** [Latest Telegraph SEO Report](https://telegra.ph/Whale-Radar-Intelligence-Brief--Oct-16-10-16)
+
+---
+
+## 💎 Commercial Licensing, Turnkey Bot & API Access
+
+| Package | Ideal For | Features | Access |
+|---|---|---|---|
+| **Open-Source Starter** | Developers & Hobbyists | CLI market scanner, DexScreener polling, terminal logs | **Free (MIT)** |
+| **Developer REST API** | Quant Traders & App Builders | Unlimited queries, RugCheck scores, 10 req/s, 99.9% uptime | [**$49/month**](https://yosefdev.my.id/api/checkout?vault=api_sub) |
+| **B2B Growth Leads Vault** | Marketing & Outbound Agencies | 5,000 Verified US Agency Founder Emails, LinkedIn, Rev stats | [**$29 once**](https://yosefdev.my.id/us-leads/) |
+| **Turnkey Whitelabel Bot** | Web3 Founders & Entrepreneurs | Full source code, PM2 configs, CryptoBot cashier, 100% rebrand rights | [**$199 once**](https://yosefdev.my.id/api/checkout?vault=whitelabel_bot) |
+
+[![Buy Whitelabel Bot](https://img.shields.io/badge/🚀_Buy_Turnkey_Whitelabel-199_USD-emerald?style=for-the-badge)](https://yosefdev.my.id/api/checkout?vault=whitelabel_bot)
+[![Get API Pass](https://img.shields.io/badge/⚡_Get_Developer_API-49_USD/mo-blue?style=for-the-badge)](https://yosefdev.my.id/api/checkout?vault=api_sub)
+[![Join Free Telegram](https://img.shields.io/badge/💬_Join_Whale_Channel-Free-2CA5E0?style=for-the-badge)](https://t.me/WhaleCryptoFree)
+
+---
+
+## 🏗️ Architecture Overview
+
+```mermaid
+flowchart TD
+    subgraph DataEngine["1. Data Harvester Engine"]
+        DS["DexScreener API v1<br/>(Token Boosts & Search)"]
+        RC["RugCheck.xyz API<br/>(Solana Risk Analysis)"]
+    end
+
+    subgraph CoreService["2. Processing & Storage Engine"]
+        AN["Anomaly Filter<br/>(Vol > $10k, Liq > $15k, Buy/Sell Ratio)"]
+        DB[("SQLite WAL Database<br/>(Zero-Lock High Concurrency)")]
+    end
+
+    subgraph Distribution["3. Automated Distribution Layer"]
+        CH["Telegram Channel<br/>(@WhaleCryptoFree)"]
+        BOT["Interactive Bot<br/>(@scraping26bot)"]
+        TG["Telegraph Publisher<br/>(Automated SEO Reports)"]
+        PAY["CryptoPay Escrow<br/>(@CryptoBot API)"]
+    end
+
+    DataEngine --> AN
+    AN --> DB
+    DB --> Distribution
 ```
-config.py     # baca rahasia dari .env
-sources.py    # ambil harga (CoinGecko, gratis tanpa key)
-analyzer.py   # hitung sinyal (inti produk)
-notifier.py   # kirim ke Telegram
-storage.py    # SQLite: riwayat harga + pelanggan
-main.py       # siklus terjadwal (cron/systemd timer)
-bot.py        # bot berlangganan (long polling)
-deploy/       # systemd service + timer + install.sh
-```
 
-## Deploy ke GitHub (dari laptop)
+---
+
+## 🚀 Quickstart: Open-Source Starter Scanner
+
+Run your own local market breakout scanner in under 2 minutes:
+
+### 1. Clone & Install Dependencies
 ```bash
-cd "/home/yosef/Dokumen/scraper data"
-git init
-git add .
-git commit -m "Siap deploy: crypto signal bot"
-# buat repo kosong di github.com, misal: username/crypto-signal
-git remote add origin git@github.com:username/crypto-signal.git
-git branch -M main
-git push -u origin main
+git clone https://github.com/yosef-lib/scraper.git
+cd scraper
+pip install -r requirements.txt
 ```
-Yang dipush aman: `.env` dan `*.sqlite3`/`*.csv`/`logs/` otomatis diabaikan
-oleh `.gitignore`. Jangan pernah `git add -f .env`.
 
-## Deploy ke VPS (Ubuntu/Debian)
+### 2. Configure Environment (Optional)
 ```bash
-# 1. Clone ke path standar
-sudo mkdir -p /opt/crypto-signal
-sudo chown $USER:$USER /opt/crypto-signal
-git clone <URL_REPO_ANDA> /opt/crypto-signal
-cd /opt/crypto-signal
-
-# 2. Install + aktifkan service (sekali saja)
-sudo bash deploy/install.sh
-
-# 3. Isi rahasia lalu restart service
-sudo nano /opt/crypto-signal/.env
-# isi: TELEGRAM_BOT_TOKEN, TELEGRAM_ADMIN_CHAT_ID, ADMIN_SECRET
-# ADMIN_SECRET acak: openssl rand -hex 16
-sudo systemctl restart scraper.timer bot.service
+cp .env.example .env
+# Fill in your TELEGRAM_BOT_TOKEN if you want channel forwarding
 ```
 
-Isi `.env` minimal:
-```
-TELEGRAM_BOT_TOKEN=<token-baru-dari-BotFather>
-TELEGRAM_ADMIN_CHAT_ID=<id-dari-@userinfobot>
-COINS=bitcoin,ethereum,solana
-ALERT_PERCENT=3.0
-ADMIN_SECRET=<kode-acak-untuk-/aktivasi>
-```
-
-## Uji manual
+### 3. Run the Starter Anomaly Hunter
 ```bash
-./.venv/bin/python main.py     # sekali jalan: ambil harga + kirim laporan
-./.venv/bin/python bot.py      # jalankan bot (Ctrl+C untuk berhenti)
+python starter_whale_radar.py
 ```
 
-## Operasional systemd
-```bash
-systemctl list-timers | grep scraper   # cek jadwal
-journalctl -u bot.service -f           # lihat log bot
-journalctl -u scraper.service --no-pager -n 50  # lihat log scraper
+Sample output:
+```text
+[INFO] 🔍 Scanning DexScreener for live breakout anomalies...
+[ANOMALY] $GTA (SOLANA)
+• Price: $0.003412 | 1h Change: +14.82%
+• 1h Volume: $48,290.00 | Liquidity: $32,150.00
+• Buy/Sell Ratio: 2.45x (Bullish Accumulation)
+• Risk Score: Good (RugCheck Verified)
+• CA: 4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R
 ```
 
-## Monetisasi
-- Free: 1 koin, tanpa detail persen.
-- Premium: semua koin, detail 24j, alert realtime.
-- Pembayaran manual dulu (transfer/e-wallet) → admin kirim kode.
-  Pelanggan jalankan `/aktivasi <kode>` (kode = `ADMIN_SECRET` di `.env`).
-- Langkah lanjut: integrasi Telegram Stars / Midtrans, multi-kode per pelanggan,
-  dan upgrade ke webhook untuk skala besar.
+---
 
-## Catatan
-- `scraper.py` lama dinonaktifkan sebagai referensi belajar; tidak lagi dipakai.
-- Ganti `COINS`, `ALERT_PERCENT`, `VS_CURRENCY` di `.env` sesuai kebutuhan.
+## 🔒 Enterprise & Production Grade Features (Included in $199 Whitelabel)
+
+1. **Zero Fake Data (Anti-Scam):** 100% verified on-chain data directly from DEX liquidity pools.
+2. **Safe Concurrency & WAL Mode:** SQLite configured with `PRAGMA journal_mode=WAL;` and `PRAGMA synchronous=NORMAL;` ensuring zero `database is locked` crashes under high load.
+3. **Automated Crypto Cashier:** Integrated `@CryptoBot` background polling (15s intervals). No domain, no SSL, and no webhooks required—runs out of the box on any Linux VPS.
+4. **Daemonized 24/7 PM2 Config:** Production `ecosystem.config.js` with auto-restart on memory spikes or server reboots.
+
+---
+
+## 🤝 Support & Inquiries
+
+* **Developer Email:** `support@yosefdev.my.id`
+* **Telegram:** [@scraping26bot](https://t.me/scraping26bot)
+* **Official Channel:** [@WhaleCryptoFree](https://t.me/WhaleCryptoFree)
+
+---
+*Distributed under the Dual MIT & Commercial Whitelabel License. Built with ❤️ for Web3 Traders and Developers worldwide.*

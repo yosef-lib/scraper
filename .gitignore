@@ -14,3 +14,11 @@ __pycache__/
 .venv/
 venv/
 
+# Scratch & patch scripts
+patch_*.py
+fix*.py
+implement_*.py
+update_*.py
+print_*.py
+remove_*.py
+find_*.py
