@@ -108,7 +108,8 @@ Sample output:
 ## 🤝 Support & Inquiries
 
 * **Developer Email:** `support@yosefdev.my.id` (or direct: `yosefpaskah@gmail.com`)
-* **Telegram:** [@scraping26bot](https://t.me/scraping26bot)
+* **Direct Telegram (Founder):** [@yosefpaskah26](https://t.me/yosefpaskah26)
+* **Live Bot Demo:** [@scraping26bot](https://t.me/scraping26bot)
 * **Official Channel:** [@WhaleCryptoFree](https://t.me/WhaleCryptoFree)
 
 ---
