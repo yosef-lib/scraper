@@ -26,9 +26,9 @@ An autonomous, multi-threaded Web3 intelligence system that monitors real-time D
 | **Developer REST API** | Quant Traders & App Builders | Unlimited queries, RugCheck scores, 10 req/s, 99.9% uptime | [**$49/month**](https://yosefdev.my.id/api/checkout?vault=api_sub) |
 | **B2B Growth Leads Vault** | Marketing & Outbound Agencies | 5,000 Verified US Agency Founder Emails, LinkedIn, Rev stats | [**$29 (Card / Apple Pay)**](https://yosefpaskah.gumroad.com/l/drbajq) · [Crypto](https://yosefdev.my.id/us-leads/) |
 | **Master Growth Bundle** | Full-Service Growth Agencies | 5k Leads + High-DA Domains + 300 Cold Email Swipes | [**$99 (Card / Apple Pay)**](https://yosefpaskah.gumroad.com/l/xogti) |
-| **Turnkey Whitelabel Bot** | Web3 Founders & Entrepreneurs | Full source code, PM2 configs, CryptoBot cashier, 100% rebrand rights | [**$199 once**](https://yosefdev.my.id/api/checkout?vault=whitelabel_bot) |
+| **Turnkey Whitelabel Bot** | Web3 Founders & Entrepreneurs | Full source code, PM2 configs, CryptoBot cashier, 100% rebrand rights | [**$199 (Card / Apple Pay)**](https://yosefpaskah.gumroad.com/l/smnzoh) · [Crypto ($199)](https://yosefdev.my.id/whitelabel/) |
 
-[![Buy Whitelabel Bot](https://img.shields.io/badge/🚀_Buy_Turnkey_Whitelabel-199_USD-emerald?style=for-the-badge)](https://yosefdev.my.id/api/checkout?vault=whitelabel_bot)
+[![Buy Whitelabel Bot](https://img.shields.io/badge/💳_Buy_Turnkey_Whitelabel-199_USD_(Card/ApplePay)-pink?style=for-the-badge)](https://yosefpaskah.gumroad.com/l/smnzoh)
 [![Get API Pass](https://img.shields.io/badge/⚡_Get_Developer_API-49_USD/mo-blue?style=for-the-badge)](https://yosefdev.my.id/api/checkout?vault=api_sub)
 [![Join Free Telegram](https://img.shields.io/badge/💬_Join_Whale_Channel-Free-2CA5E0?style=for-the-badge)](https://t.me/WhaleCryptoFree)
 
